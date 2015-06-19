@@ -15,7 +15,6 @@ class UkuuPeople{
      * Insert Contact Type and Activity Type taxonomy terms on plugin activation
      */
     add_action( 'admin_init', array( $this , 'insert_taxonomy_terms' ));
-    add_action( "admin_init", array ( $this,"remove_box" ));
     add_action( 'wp_dashboard_setup', array( $this, 'ukuuCRM_dashboard_setup' ) );
 
     /* metabox for custom activity list */
@@ -33,7 +32,9 @@ class UkuuPeople{
     /* Change email to display name */
     add_filter( 'the_title', array( $this , 'change_related_org_value' ), 9999, 2 );
 
-    // hide fields table meta box
+    // rename fields table meta box title
+    add_action( 'in_admin_header', array( $this , 'rename_fieldstable_box' ), 9999 );
+
     add_filter("simple_fields_add_post_edit_side_field_settings", array( $this , "hide_simple_side_field_settings" ), 10, 2);
 
     /*
@@ -108,18 +109,13 @@ class UkuuPeople{
     add_action( 'wp-type-activity-types_add_form_fields', array ( $this, 'add_color_fields' ) );
     add_action( 'create_wp-type-activity-types', array ( $this, 'save_color_fields' ) );
 
-  }
-
-  function remove_box()
-  {
-    remove_post_type_support('wp-type-contacts', 'title');
-    remove_post_type_support('wp-type-contacts', 'editor');
-    remove_post_type_support('wp-type-activity', 'editor');
+    add_action( 'wp-type-activity-types_edit_form_fields', array ( $this, 'edit_color_fields' ) );
+    add_action( 'edit_wp-type-activity-types', array ( $this, 'save_color_fields' ) );
   }
 
   function ukuupeople_menu() {
     add_submenu_page( NULL, 'Add New Contact', 'Add New Contact', 'manage_options', 'add-new-contact', array( $this, 'add_new_contact_type'));
-    add_submenu_page( 'edit.php?post_type=wp-type-contacts' , 'Touchpoint', 'Touchpoints', 'manage_options', 'edit.php?post_type=wp-type-activity', '');
+    add_submenu_page( 'edit.php?post_type=wp-type-contacts' , 'Touchpoint', 'Touchpoints', 'manage_options', 'edit.php?post_type=wp-type-activity', '' );
     require_once(UKUUPEOPLE_ABSPATH.'/includes/add-ons.php');
     $ukuupeople_add_ons_page = add_submenu_page( 'edit.php?post_type=wp-type-contacts', __( 'UkuuPeople Add-ons', 'ukuupeople' ), __( 'Add-ons', 'UkuuPeople' ), 'install_plugins', 'ukuupeople-addons', 'ukuupeople_add_ons_page' );
     if ( current_user_can('manage_categories') ) {
@@ -219,6 +215,18 @@ class UkuuPeople{
   }
 
   /**
+   * rename fields table meta box title.
+   */
+  function rename_fieldstable_box() {
+    global $wp_meta_boxes;
+    /* Specified Custom Post Type. */
+    $custom_post_type = 'wp-type-activity';
+    if ( array_key_exists($custom_post_type, $wp_meta_boxes) ) {
+      $wp_meta_boxes[$custom_post_type]['normal']['default']['wpcf-post-relationship']['title'] = __('Touchpoint Contact');
+    }
+  }
+
+  /**
    * Returns filter text.
    *
    * @global type $wpdb
@@ -279,12 +287,9 @@ class UkuuPeople{
                ON ($wpdb->posts.ID = $wpdb->postmeta.post_id)
                WHERE (post_status = 'publish' OR  post_status = 'private')
                AND post_type = 'wp-type-contacts'
-               AND ((meta_key='wpcf-display-name' and meta_value like %s) OR (meta_key='wpcf-email' and meta_value = %s)
-               OR (meta_key='wpcf-first-name' and meta_value like %s ) OR (meta_key='wpcf-last-name' and meta_value like %s))
+               AND ((meta_key='wpcf-display-name' and meta_value like %s) OR (meta_key='wpcf-email' and meta_value = %s))
                ",
                $meta_value,
-               $meta_value,
-	        $meta_value,
                $meta_value
         ) , OBJECT);
 
@@ -340,14 +345,14 @@ class UkuuPeople{
       // To change Dropdown email list to display name//
       global $wpdb;
       $opt = array(
-         '0' => 'None',
+         '0' => 'Not selected',
       );
       $args = array(
         'fields' => 'ids',
-        'posts_per_page' => -1,
+        'numberposts' => -1,
         'orderby' => 'title',
         'order' => 'ASC',
-        'post_status' => array( 'publish', 'private' ) ,
+        'post_status' => apply_filters( 'wpcf_pr_belongs_post_status', array( 'publish', 'private' ) ),
         'post_type' => 'wp-type-contacts',
         'suppress_filters' => 0,
       );
@@ -359,11 +364,11 @@ class UkuuPeople{
         }
       }
       $postid = json_encode(get_post_meta( $post->ID , '_wpcf_belongs_wp-type-contacts_id', true ));
-      $opt = json_encode($opt);?>
+      $opt = json_encode($opt); ?>
       <script type="text/javascript">
          var newOptions = <?php echo $opt; ?>;
          var postID = <?php echo $postid; ?>;
-         var $el = jQuery('select[name="wpcf-pr-belongs"]');
+         var $el = jQuery('select[name^="wpcf_pr_belongs"]');
          $el.empty(); // remove old options
          jQuery.each(newOptions, function(value,key) {
              if ( postID == value ) {
@@ -463,7 +468,8 @@ class UkuuPeople{
         echo "<div class='dashboard-favorites-list'>";
         echo "<div class='contact-image'>";
         if ( ! empty( $custom['wpcf-contactimage'][0] ) ) {
-          echo "<img src='".$custom['wpcf-contactimage'][0]."' width='69' height='69'>";
+          include_once WPCF_ABSPATH.'/embedded/frontend.php';
+          echo types_render_field( "contactimage", array( 'post_id' => $postID, "url" => "false", "width" => "69", "height" => "69"));
         } else {
           $avatar = get_avatar( $custom['wpcf-email'][0] ,69);
           echo $avatar;
@@ -473,7 +479,8 @@ class UkuuPeople{
         echo "<span class='contact-name'>";
         $URL = get_edit_post_link( $postID );
         echo "<a href='{$URL}'><b>";
-        if( isset($custom['wpcf-display-name'][0]  )) echo $custom['wpcf-display-name'][0];
+        if( isset($custom['wpcf-first-name'][0]  )) echo $custom['wpcf-first-name'][0];
+        if( isset($custom['wpcf-last-name'][0]  )) echo " ".$custom['wpcf-last-name'][0];
         echo "</b></a></span>";
         if( isset($custom['wpcf-email'][0]  )) echo "<br/><span class='dashboard-email'><a href='mailto:{$custom['wpcf-email'][0]}' title='email'><u>{$custom['wpcf-email'][0]}</u></a></span>";
         if( isset($custom['wpcf-phone'][0]  )) echo "<br/><span class='dashboard-email'>{$custom['wpcf-phone'][0]}</span>";
@@ -692,11 +699,16 @@ class UkuuPeople{
    * Insert taxonomy terms for custom taxonomy on plugin activation.
    */
   function insert_taxonomy_terms() {
+    $exist= get_option('ukuupeople_tax_terms');
+    require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+    if ( $exist == 'set' && is_plugin_active('types/wpcf.php') ) {
       // To add custom taxonomy terms
       $cTypes = array('ind' => array('name' => 'Individual', 'slug' => 'wp-type-ind-contact'),'org' => array('name' => 'Organization', 'slug' => 'wp-type-org-contact') ) ;
       self::add_taxonomies($cTypes, 'wp-type-contacts-subtype');
       $aTypes = array('meeting' => array('name' => 'Meeting', 'slug' => 'wp-type-activity-meeting'),'phone' => array('name' => 'Phone', 'slug' => 'wp-type-activity-phone') , 'note' => array('name' => 'Note', 'slug' => 'wp-type-activity-note') , 'contact-form' => array('name' => 'Contact Form', 'slug' => 'wp-type-contactform'));
       self::add_taxonomies($aTypes, 'wp-type-activity-types');
+      delete_option('ukuupeople_tax_terms');
+    }
   }
 
   /*
@@ -1042,10 +1054,10 @@ class UkuuPeople{
         echo get_post_meta( get_the_ID(), 'wpcf-email', true);
         break;
       case 'wp-color-code': // Contact type
-
+        include_once WPCF_ABSPATH.'/embedded/frontend.php';
         $contact_image = get_post_meta( get_the_ID(), 'wpcf-contactimage', true );
         if ( ! empty( $contact_image ) ) {
-          echo "<span class='contactimage'><img src='".$contact_image."' width='32' height='32'></span>";
+          echo "<span class='contactimage'>".types_render_field( "contactimage", array(  'post_id' => get_the_ID(), "width"=>"32","height"=>"32", "output" =>"html", "url" => "false" ) )."</span>";
         } else {
           $avatar = get_avatar( get_post_meta( get_the_ID() , 'wpcf-email', true ) ,32);
           echo "<span class='contactimage'>".$avatar."</span>";
@@ -1083,18 +1095,8 @@ class UkuuPeople{
           $months = array_merge($months, $mv);
         }
         $timeline = array();
-        $args = array(
-          'post_type' => 'wp-type-activity',
-          'posts_per_page' => -1,
-          'meta_query' => array(
-            array(
-              'key'     => '_wpcf_belongs_wp-type-contacts_id',
-              'value'   => get_the_ID(),
-            ),
-          )
-        );
-        $loop = new WP_Query( $args );
-        foreach ( $loop->posts as $child_post ) {
+        $child_posts = types_child_posts( 'wp-type-activity', array('post_status' => 'publish,private') );
+        foreach ( $child_posts as $child_post ) {
           $date = get_post_meta( $child_post->ID, 'wpcf-startdate', true);
           if ( !empty($date) ) {
             $activityMonth =  date( 'n', date($date) );
@@ -1137,18 +1139,12 @@ class UkuuPeople{
   function ukku_contacts_custom_fields_list_view($defaults) {
     unset( $defaults['date'] );
     unset( $defaults['categories'] );
-    $defaults['cb'] = __('input id="cb-select-all-1" type="checkbox"');
     $defaults['wp-color-code'] = __('');
     $defaults['wp-contact-full-name'] = __('Name');
     $defaults['wp-email'] = __('Email');
     $defaults['wp-phone'] = __('Phone');
     $defaults['wp-type-activity'] = __('TouchPoint');
     $defaults['wp-favorites'] = __('');
-    $Order = array( 'cb' ,'wp-color-code' , 'wp-contact-full-name' , 'wp-email' , 'wp-phone' , 'wp-type-activity','wp-favorites');
-    foreach ($Order as $colname){
-      $new[$colname] = $defaults[$colname];
-    }
-    $defaults = $new;
     return $defaults;
   }
 
@@ -1189,11 +1185,11 @@ class UkuuPeople{
    * @param type $id activity id
    */
   function activity_assigned ( $id ) {
-    $repeatable_field_values = get_post_meta( $id , 'wpcf_assigned_to', true);
+    $repeatable_field_values = simple_fields_values ( "wp_activity_assigned_contact" , $id );
     $data = array();
-    if ( $repeatable_field_values ) {
+    if ( reset($repeatable_field_values) ) {
       foreach ( $repeatable_field_values as $key => $val ) {
-        $data[] = get_post_meta( $val , 'wpcf-display-name', true );
+        $data[] = get_post_meta( $val['id'] , 'wpcf-display-name', true );
       }
     }
     $data = implode (',', $data );
@@ -1379,8 +1375,6 @@ class UkuuPeople{
         update_post_meta( $post_ID, 'wpcf-enddate', strtotime(get_the_date('Y-m-d H:i:s')));
         update_post_meta( $post_ID, 'wpcf-status', '' );
       }
-      if ( isset( $_POST['wpcf-pr-belongs'] ) && empty( $_POST['hidden_cid'] ) )
-      update_post_meta( $post_ID , "_wpcf_belongs_wp-type-contacts_id", $_POST['wpcf-pr-belongs'] );
     }
   }
 
@@ -1423,9 +1417,7 @@ class UkuuPeople{
   function closed_meta_boxes( $closed ) {
     global $post;
     if ( isset($post->ID) && $post->filter == 'edit' ) {
-      $closed = array( 'wpcf-group-edit-contact-info', 'wpcf-group-edit_contact_address', 'wpcf-group-edit_contact_privacy_settings' , 'wpcf-related-org-metabox' );
-    } elseif ( isset($post->ID) && $post->filter == 'raw' ) {
-      $closed = array();
+      $closed = array( 'wpcf-group-edit-contact-info', 'wpcf-group-edit_contact_address', 'wpcf-group-edit_contact_privacy_settings', 'simple_fields_connector_2' );
     }
     return $closed;
   }
@@ -1442,23 +1434,30 @@ class UkuuPeople{
       // Custom fields update for ukuupeople organization //
       if ( isset ( $type[0]->slug ) && $type[0]->slug =='wp-type-org-contact' ) { ?><script>
         jQuery( document ).ready(function() {
-          jQuery('.post-type-wp-type-contacts #wpcf-related-org-metabox').hide();
-          jQuery('.post-type-wp-type-contacts #cmb2-metabox-wpcf-group-edit-contact-info .cmb2-id-wpcf-first-name').hide();
-          jQuery('.post-type-wp-type-contacts #cmb2-metabox-wpcf-group-edit-contact-info .cmb2-id-wpcf-last-name').hide();
-          jQuery('.post-type-wp-type-contacts #cmb2-metabox-wpcf-group-edit-contact-info .cmb2-id-wpcf-ukuu-job-title').remove();
-          jQuery('.post-type-wp-type-contacts #cmb2-metabox-wpcf-group-edit-contact-info .cmb2-id-wpcf-ukuu-date-of-birth').remove();
-          jQuery('.post-type-wp-type-contacts #cmb2-metabox-wpcf-group-edit-contact-info .cmb2-id-wpcf-first-name').find("input").prop("disabled",true);
-          jQuery('.post-type-wp-type-contacts #cmb2-metabox-wpcf-group-edit-contact-info .cmb2-id-wpcf-last-name').find("input").prop("disabled",true);
+          jQuery('.post-type-wp-type-contacts #simple_fields_connector_2').hide();
+          jQuery('.post-type-wp-type-contacts #wpcf-group-edit-contact-info .inside div[data-wpt-id="wpcf-first-name"]').hide();
+          jQuery('.post-type-wp-type-contacts #wpcf-group-edit-contact-info .inside div[data-wpt-id="wpcf-last-name"]').hide();
+          jQuery('.post-type-wp-type-contacts #wpcf-group-edit-contact-info .inside div[data-wpt-id="wpcf-ukuu-job-title"]').remove();
+          jQuery('.post-type-wp-type-contacts #wpcf-group-edit-contact-info .inside div[data-wpt-id="wpcf-ukuu-date-of-birth"]').remove();
+          jQuery('.post-type-wp-type-contacts #wpcf-group-edit-contact-info .inside div[data-wpt-id="wpcf-first-name"]').find("input").prop("disabled",true);
+          jQuery('.post-type-wp-type-contacts #wpcf-group-edit-contact-info .inside div[data-wpt-id="wpcf-last-name"]').find("input").prop("disabled",true);
           // Validation for Display name field //
-          jQuery('.post-type-wp-type-contacts .cmb2-id-wpcf-display-name label').append('*');
-          jQuery('.post-type-wp-type-contacts .cmb2-id-wpcf-display-name input').prop('required',true);
+          jQuery('.post-type-wp-type-contacts .inside div[data-wpt-id="wpcf-display-name"] label').append('*');
+          jQuery('.post-type-wp-type-contacts #submitpost #publish').click( function() {
+            var display = jQuery('.post-type-wp-type-contacts  .inside div[data-wpt-id="wpcf-display-name"] input').val();
+            if (  display == '' ) {
+              jQuery( '.post-type-wp-type-contacts .inside div[data-wpt-id="wpcf-display-name"] label[class="wpt-form-error"]' ).remove();
+              jQuery('.post-type-wp-type-contacts .inside div[data-wpt-id="wpcf-display-name"] input').focus();
+              jQuery('.post-type-wp-type-contacts .inside div[data-wpt-id="wpcf-display-name"] input').before('<label generated="true" class="wpt-form-error">This field is required</label>');
+              return false;
+            }
+          });
         }); </script><?php
       }
       // Custom fields update for ukuupeople Individual //
       if ( isset ( $type[0]->slug ) && $type[0]->slug =='wp-type-ind-contact' ) { ?><script>
         jQuery( document ).ready(function() {
-          jQuery('.post-type-wp-type-contacts #wpcf-related-org-metabox').show();
-          jQuery('.post-type-wp-type-contacts #cmb2-metabox-wpcf-group-edit-contact-info .cmb2-id-wpcf-display-name').hide();
+          jQuery('.post-type-wp-type-contacts #wpcf-group-edit-contact-info .inside div[data-wpt-id="wpcf-display-name"]').hide();
         }); </script><?php
       }
 
@@ -1471,12 +1470,13 @@ class UkuuPeople{
           $phoneNumber = rtrim($phoneNumber , '-');
           $custom['wpcf-phone'][0] =  $phoneNumber;
         }
-
+        include_once WPCF_ABSPATH.'/embedded/frontend.php';
+	
         $contactdetailsblock = array_intersect_key ( $custom, $contactdetails_keys ) ;
         $ctags = wp_get_post_terms($edit->ID, 'wp-type-tags', array("fields" => "names"));
         echo '<div id="first-sidebar-contact"> <div id="user-images">';
         if ( ! empty( $custom['wpcf-contactimage'][0] ) ) {
-          echo "<img src='".$custom['wpcf-contactimage'][0]."' width='150' height='150'>";
+          echo types_render_field( "contactimage", array( 'post_id' => $edit->ID, "size" => "thumbnail", "output" =>"html", "url" => "false") );
         } else {
           $avatar = get_avatar( $custom['wpcf-email'][0] ,150);
           echo $avatar;
@@ -1500,17 +1500,17 @@ class UkuuPeople{
           echo "<tr><td><span class='contactdetailhead'>".ucfirst(substr($key, 5))."</span></td><td class='title-value'>".$value[0]."</td></tr>";
         }
         if ( isset( $custom['wpcf-ukuu-job-title'] ) ) {
-          echo "<tr><td><span class='contactdetailhead'>Job Title</span></td><td class='title-value'>". $custom['wpcf-ukuu-job-title'][0]. "</td></tr>";
+          echo "<tr><td><span class='contactdetailhead'>Job Title</span></td><td class='title-value'>". types_render_field( "ukuu-job-title", array() ). "</td></tr>";
         }
 
         if ( isset( $custom['wpcf-ukuu-twitter-handle'] ) ) {
-          echo "<tr><td><span class='contactdetailhead'>Twitter Handle</span></td><td class='title-value'>". $custom['wpcf-ukuu-twitter-handle'][0] ."</td></tr>";
+          echo "<tr><td><span class='contactdetailhead'>Twitter Handle</span></td><td class='title-value'>". types_render_field( "ukuu-twitter-handle", array() ) ."</td></tr>";
         }
         if ( isset( $custom['wpcf-ukuu-facebook-url'] ) ) {
-          echo "<tr><td><span class='contactdetailhead'>Facebook URL</span></td><td class='title-value'>". $custom['wpcf-ukuu-facebook-url'][0] ."</td></tr>";
+          echo "<tr><td><span class='contactdetailhead'>Facebook URL</span></td><td class='title-value'>". types_render_field( "ukuu-facebook-url", array('style' => 'color: #0a73b9') ) ."</td></tr>";
         }
         if ( isset( $custom['wpcf-ukuu-date-of-birth'] ) && !empty( $custom['wpcf-ukuu-date-of-birth'][0] ) ) {
-          echo "<tr><td><span class='contactdetailhead'>Date Of Birth</span></td><td class='title-value'>". $custom['wpcf-ukuu-date-of-birth'][0] ."</td></tr>";
+          echo "<tr><td><span class='contactdetailhead'>Date Of Birth</span></td><td class='title-value'>". types_render_field("ukuu-date-of-birth", array()) ."</td></tr>";
         }
 
         echo '</table></div></div><div id="second-sidebar-contact"><div id="addressblock">';
@@ -1573,7 +1573,7 @@ class UkuuPeople{
         wp_set_object_terms( $postarr['ID'], $_POST['touchpoint-list'] , 'wp-type-activity-types' , true );
         if ( isset($_POST['hidden_cid'] ) && !empty( $_POST['hidden_cid'] ) ) {
           update_post_meta( $postarr['ID'], "_wpcf_belongs_wp-type-activity_id", $_POST['hidden_cid'] );
-          update_post_meta( $postarr['ID'], "_wpcf_belongs_wp-type-contacts_id", $_POST['hidden_cid'] );
+          wpcf_pr_admin_update_belongs( $postarr['ID'] , array('wp-type-contacts' => $_POST['hidden_cid'] ) );
         }
       }
     }

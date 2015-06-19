@@ -299,26 +299,13 @@
     	background-color: #fff;
 }
 
-/* CSS For meta boxes */
-.post-type-wp-type-contacts #postbox-container-2 .postbox div.inside > div > div > div{
-	width:46% !important;
-	border-bottom:none;
-	padding: 0 23px 0 0;
-	display: inline-block;  
+/* CSS For meta boxes on conatcts pages */
+.post-type-wp-type-contacts #postbox-container-2 .postbox div.inside > div > div {
+    	float: left;
+    	width: 46%;
+    	padding-right:23px;
 }
 
-.post-type-wp-type-contacts #postbox-container-2 .postbox div.inside > div > div > div .cmb-th, .post-type-wp-type-contacts #postbox-container-2 .postbox div.inside > div > div > div .cmb-td{
-	float:none;
-	width:100%;
-}
-
-.post-type-wp-type-contacts #postbox-container-2 .postbox div.inside > div > div > div input.cmb2-upload-file {
-	width: 60% !important;
-}
-
-.post-type-wp-type-contacts #postbox-container-2 .postbox div.inside > div > div > div input.cmb2-text-medium {
-	width: 100% !important;
-}
 
 /* Favorites star */
 .add-star {

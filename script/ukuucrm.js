@@ -61,11 +61,18 @@ jQuery(function ($) {
 });
 
 jQuery(document).ready(function() {
+    jQuery('.post-type-wp-type-contacts #wpcf-group-edit-contact-info .inside div[data-wpt-id="wpcf-normal-name"]').hide();
     touchpoint = '#'+jQuery("#touchpoint-types").parent().attr('id');
+    addtouchpoint = '#'+jQuery("#types-child-table-wp-type-contacts-wp-type-activity").parent().parent().attr('id');
+    jQuery('.simple-fields-meta-box-field-group-wrapper-slug-wp_type_contacts_org_relation .simple-fields-metabox-field-post-select').html('Select Organization');
+    jQuery( addtouchpoint ).hide();
     jQuery( touchpoint ).insertBefore("#post-body-content");
     jQuery( "#touchpoint-types" ).removeClass( "postbox" );
     jQuery('.graph-main-container').insertBefore("#posts-filter");
     jQuery('#activity-list').insertAfter("#postbox-container-2 #wpcf-post-relationship");
+    jQuery('#wpcf-group-edit_contact_privacy_settings .inside').append('<div class="clear"></div>');
+    jQuery('#wpcf-group-edit-contact-info .inside').append('<div class="clear"></div>');
+    jQuery('#wpcf-group-edit_contact_address .inside').append('<div class="clear"></div>');
     noteChanges(jQuery('select#touchpoint-list'));
 
     jQuery('.post-type-wp-type-activity #submitpost #publish').click( function() {
@@ -74,9 +81,9 @@ jQuery(document).ready(function() {
 	    var display = jQuery('div[data-wpt-id="wpcf-'+value+'"]').find('input').val();
 	    var note = jQuery('select#touchpoint-list').val();
             if ( (display == '' || !display) && (note == 'wp-type-activity-note')) {
-		jQuery('.post-type-wp-type-activity .cmb2-id-wpcf-startdate input').prop("disabled",true);
-		jQuery('.post-type-wp-type-activity .cmb2-id-wpcf-enddate input').prop("disabled",true);
-		jQuery('.post-type-wp-type-activity .cmb2-id-wpcf-status input').prop("disabled",true);
+		jQuery('.inside div[data-wpt-id="wpcf-'+value+'"] input').datepicker("setDate", new Date());
+		jQuery('input[data-wpt-id="wpcf-'+value+'-datepicker"]').val(jQuery('.inside div[data-wpt-id="wpcf-'+value+'"] input').val());
+		console.log(jQuery('.inside div[data-wpt-id="wpcf-'+value+'"] input').val());
             }
 	});
     });
@@ -86,15 +93,156 @@ jQuery(document).ready(function() {
     });
     function noteChanges ($this) {
 	if (jQuery($this).val() == 'wp-type-activity-note') {
-	    jQuery('.post-type-wp-type-activity #cmb2-metabox-wpcf-activity_information_metabox .cmb2-id-wpcf-startdate').hide();
-	    jQuery('.post-type-wp-type-activity #cmb2-metabox-wpcf-activity_information_metabox .cmb2-id-wpcf-enddate').hide();
-	    jQuery('.post-type-wp-type-activity #cmb2-metabox-wpcf-activity_information_metabox .cmb2-id-wpcf-status').hide();
+            jQuery('div[data-wpt-id="wpcf-startdate"]').hide();
+            jQuery('div[data-wpt-id="wpcf-enddate"]').hide();
+            jQuery('div[data-wpt-id="wpcf-status"]').hide();
 	} else {
-	    jQuery('.post-type-wp-type-activity #cmb2-metabox-wpcf-activity_information_metabox .cmb2-id-wpcf-startdate').show();
-	    jQuery('.post-type-wp-type-activity #cmb2-metabox-wpcf-activity_information_metabox .cmb2-id-wpcf-enddate').show();
-	    jQuery('.post-type-wp-type-activity #cmb2-metabox-wpcf-activity_information_metabox .cmb2-id-wpcf-status').show();
+            jQuery('div[data-wpt-id="wpcf-startdate"]').show();
+            jQuery('div[data-wpt-id="wpcf-enddate"]').show();
+            jQuery('div[data-wpt-id="wpcf-status"]').show();
 	}
     }
+
+    jQuery('select[name="wpcf[startdate][hour]"]').hide();
+    jQuery('select[name="wpcf[startdate][hour]"]').prev('span').hide();
+
+    jQuery('select[name="wpcf[startdate][minute]"]').hide();
+    jQuery('select[name="wpcf[startdate][minute]"]').prev('span').hide();
+
+    jQuery('select[name="wpcf[enddate][hour]"]').hide();
+    jQuery('select[name="wpcf[enddate][hour]"]').prev('span').hide();
+
+    jQuery('select[name="wpcf[enddate][minute]"]').hide();
+    jQuery('select[name="wpcf[enddate][minute]"]').prev('span').hide();
+
+    function createEle ($this , $i) {
+	var option = document.createElement("option");
+	option.value = $i;
+	option.text = $i;
+	jQuery($this).append(option);
+    }
+    function hourChange ($this , $id) {
+	var x = document.getElementById($id).value;
+	if (x == "PM") {
+	    var y = parseInt(jQuery($this).val()) + 12 ;
+	    if (parseInt(y) == 24) y = 0;
+	}
+	if (x == "AM") {
+	    var y = jQuery($this).val();
+	}
+    }
+    function ampmChange ($this , $id) {
+	var x = document.getElementById($id).value;
+	var y = jQuery($this).val();
+	if (y == "PM") {
+	    var z = parseInt(x) + 12 ;
+	    if (parseInt(z) == 24) z = 0;
+	}
+	if (y == "AM") {
+	    var z = parseInt(x);//jQuery(this).val();
+	}
+    }
+    function appendOption ($this) {
+	var array = ["AM","PM"];
+	for (var i = 0; i < array.length; i++) {
+	    var option = document.createElement("option");
+	    option.value = array[i];
+	    option.text = array[i];
+	    jQuery($this).append(option);
+	}
+    }
+    var startHour = document.createElement("select");
+    startHour.id = "startdate-hour";
+    jQuery('div[data-wpt-id="wpcf-startdate"] > div > div').append(startHour);
+    jQuery('<span class="wpt-form-label">Hour</span>').insertBefore('#startdate-hour');
+    //Create and append the options
+    for (var i = 0; i <= 12; i++) { 
+	createEle (startHour, i);
+    }
+
+    var startMinute = document.createElement("select");
+    startMinute.id = "startdate-minute";
+    jQuery('div[data-wpt-id="wpcf-startdate"] > div > div').append(startMinute);
+    jQuery('<span class="wpt-form-label">Minutes</span>').insertBefore('#startdate-minute');
+
+    //Create and append the options
+    for (var i = 0; i <= 59; i++) {
+	createEle (startMinute, i);
+    }
+    jQuery('#startdate-minute').val(parseInt(jQuery('select[name="wpcf[startdate][minute]"]').val()));
+
+    var ampm = document.createElement("select");
+    ampm.id = "ampm";
+    jQuery('div[data-wpt-id="wpcf-startdate"] > div > div').append(ampm);
+    
+    //Create and append the options
+    appendOption (ampm);
+    
+    if (jQuery('select[name="wpcf[startdate][hour]"]').val() > 12) {
+	jQuery('#startdate-hour').val(parseInt(jQuery('select[name="wpcf[startdate][hour]"]').val()) - 12);
+	jQuery('#ampm').val('PM');
+    }
+    else
+	jQuery('#startdate-hour').val(parseInt(jQuery('select[name="wpcf[startdate][hour]"]').val()));
+    jQuery(startHour).on('change', function() {
+	hourChange (this , "ampm");
+	jQuery('select[name="wpcf[startdate][hour]"]').val(y);
+    });
+    jQuery(startMinute).on('change', function() {
+	var y = jQuery(this).val();
+	jQuery('select[name="wpcf[startdate][minute]"]').val(y);
+    });
+    jQuery(ampm).on('change', function() {
+	ampmChange (this , "startdate-hour");
+	jQuery('select[name="wpcf[startdate][hour]"]').val(z);
+    });
+
+    var endHour = document.createElement("select");
+    endHour.id = "enddate-hour";
+    jQuery('div[data-wpt-id="wpcf-enddate"] > div > div').append(endHour);
+    jQuery('<span class="wpt-form-label">Hour</span>').insertBefore('#enddate-hour');
+
+    //Create and append the options
+    for (var i = 0; i <= 12; i++) {
+	createEle (endHour, i);
+    }
+    var endMinute = document.createElement("select");
+    endMinute.id = "enddate-minute";
+    jQuery('div[data-wpt-id="wpcf-enddate"] > div > div').append(endMinute);
+    jQuery('<span class="wpt-form-label">Minutes</span>').insertBefore('#enddate-minute');
+
+    //Create and append the options
+    for (var i = 0; i <= 59; i++) {
+	createEle (endMinute, i);
+    }
+    jQuery('#enddate-minute').val(parseInt(jQuery('select[name="wpcf[enddate][minute]"]').val()));
+
+    var ampmEnd = document.createElement("select");
+    ampmEnd.id = "ampm-end";
+    jQuery('div[data-wpt-id="wpcf-enddate"] > div > div').append(ampmEnd);
+
+    //Create and append the options
+    appendOption (ampmEnd);
+
+    if (jQuery('select[name="wpcf[enddate][hour]"]').val() > 12) {
+	jQuery('#enddate-hour').val(parseInt(jQuery('select[name="wpcf[enddate][hour]"]').val()) - 12);
+	jQuery('#ampm-end').val('PM');
+    }
+    else
+	jQuery('#enddate-hour').val(parseInt(jQuery('select[name="wpcf[enddate][hour]"]').val()));
+
+    jQuery(endHour).on('change', function() {
+	hourChange (this , "ampm-end");
+	jQuery('select[name="wpcf[enddate][hour]"]').val(y);
+    });
+    jQuery(endMinute).on('change', function() {
+	var y = jQuery(this).val();
+	jQuery('select[name="wpcf[enddate][minute]"]').val(y);
+    });
+    jQuery(ampmEnd).on('change', function() {
+	ampmChange (this , "enddate-hour");
+	jQuery('select[name="wpcf[enddate][hour]"]').val(z);
+    });
 });
 
 //graph on Contact and event list
