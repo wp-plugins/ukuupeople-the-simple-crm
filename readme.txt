@@ -1,4 +1,4 @@
-﻿=== UkuuPeople - The Simple CRM ===
+=== UkuuPeople - The Simple CRM ===
 Contributors: nathanporter, marisaporter, stephenlobo, tonymazz, kurund, nileemaJ, yogeshnipane
 Donate Link: http://ukuupeople.com
 Tags: crm, contact, customer, client, relationship manager, wordpress crm, nonprofit, mailchimp, marketing, sales, email, list building, fundraising, donations
