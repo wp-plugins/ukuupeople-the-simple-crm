@@ -1,963 +1,441 @@
 <?php
+defined( 'ABSPATH' ) OR exit;
+/**
+ * Get the bootstrap! If using the plugin from wordpress.org, REMOVE THIS!
+ */
+if ( file_exists( UKUUPEOPLE_ABSPATH . '/includes/cmb2/init.php' ) ) {
+	require_once UKUUPEOPLE_ABSPATH . '/includes/cmb2/init.php';
+} elseif ( file_exists( UKUUPEOPLE_ABSPATH . '/includes/CMB2/init.php' ) ) {
+	require_once UKUUPEOPLE_ABSPATH . '/includes/CMB2/init.php';
+}
 
-$customterm = array(
+/**
+ * Get the custom fields array
+ */
+global $customterm;
+if ( file_exists( UKUUPEOPLE_ABSPATH . '/custom-fields.php' ) ) {
+  require_once UKUUPEOPLE_ABSPATH . '/custom-fields.php';
+}
+/**
+ * To create custom post type
+ */
+add_action( 'init','create_post_type' );
 
-  'custom_types' => array(
-    'wp-type-contacts' => array(
-      'labels' => array(
-        'name' => 'UkuuPeople',
-        'singular_name' => 'Human',
-        'add_new' => 'Add New',
-        'add_new_item' => 'Add New %s',
-        'edit_item' => '%s',
-        'new_item' => 'New %s',
-        'view_item' => 'View %s',
-        'search_items' => 'Search %s',
-        'not_found' => 'No %s found',
-        'not_found_in_trash' => 'No %s found in Trash',
-        'parent_item_colon' => 'Parent text',
-        'all_items' => 'People',
-      ),
-      'slug' => 'wp-type-contacts',
-      'description' => 'Wordpress custom contacts which will be synced with user',
-      'icon' => 'admin-users',
-      'public' => 'public',
-      'menu_position' =>'',
-      'menu_icon' =>'',
-      'taxonomies' => array(
-        'category' => 1,
-        'wp-type-group' => 1,
-        'wp-type-tags' => 1,
-      ),
-      'supports' => array(
-        'title' => 1,
-      ),
-      'rewrite' => array(
-        'enabled' => 1,
-        'custom' => 'normal',
-        'slug' => '',
-        'with_front' => 1,
-        'feeds' => 1,
-        'pages' => 1,
-      ),
-      'has_archive' => 1,
-      'show_in_menu' => 1,
-      'show_in_menu_page' => '',
-      'show_ui' => 1,
-      'publicly_queryable' => 1,
-      'can_export' => 1,
-      'show_in_nav_menus' => 1,
-      'query_var_enabled' => 1,
-      'query_var' => '',
-      'permalink_epmask' => 'EP_PERMALINK',
-      'wpcf-post-type' => '',
-      'post_relationship' => array(
-        'has' => array(
-          'wp-type-activity' => 1
-        )
-      )
-    ),
-    'wp-type-activity' => array(
-      'labels' => array(
-        'name' => 'Touchpoints',
-        'singular_name' => 'Touchpoint',
-        'add_new' => 'Add New',
-        'add_new_item' => 'Add New %s',
-        'edit_item' => 'Edit %s',
-        'new_item' => 'New %s',
-        'view_item' => 'View %s',
-        'search_items' => 'Search %s',
-        'not_found' => 'No %s found',
-        'not_found_in_trash' => 'No %s found in Trash',
-        'parent_item_colon' => 'Parent text',
-        'all_items' => 'People',
-      ),
-      'slug' => 'wp-type-activity',
-      'description' => 'Activities for wordpress contacts/users',
-      'icon' => 'clipboard',
-      'public' => 'public',
-      'menu_position' =>'',
-      'menu_icon' =>'',
-      'supports' => array(
-         'title' => 1,
-      ),
-      'rewrite' => array(
-        'enabled' => 1,
-        'custom' => 'normal',
-        'slug' => '',
-        'with_front' => 1,
-        'feeds' => 1,
-        'pages' => 1,
-      ),
-      'has_archive' => 1,
-      'show_in_menu' => 1,
-      'show_in_menu_page' => '',
-      'show_ui' => 1,
-      'publicly_queryable' => 1,
-      'can_export' => 1,
-      'show_in_nav_menus' => 1,
-      'query_var_enabled' => 1,
-      'query_var' => '',
-      'permalink_epmask' => 'EP_PERMALINK',
-      'wpcf-post-type' => '',
-      'post_relationship' => array(
-        'belongs' => array(
-          'wp-type-contacts' => 1
-        )
+/**
+ * To create custom fields for ukuupeople
+ */
+add_action( 'cmb2_init', 'ukuu_register_contact_metabox' );
+add_action( 'cmb2_init', 'ukuu_register_setting_metabox' );
+add_action( 'cmb2_init', 'ukuu_register_address_metabox' );
+add_action( 'cmb2_init', 'ukuu_register_related_org_metabox' );
+
+/**
+ * To create custom fields for Touchpoints
+ */
+add_action( 'cmb2_init', 'touchpoints_register_metabox' );
+add_action( 'cmb2_init', 'touchpoints_register_contacts_metabox' );
+add_action( 'cmb2_init', 'touchpoints_register_assigned_to_metabox' );
+
+/**
+ * To change the year range
+ */
+add_filter( 'cmb2_localized_data', 'update_date_picker_defaults' );
+
+function create_post_type() {
+	$labels = array(
+		'name'               => _x( 'UkuuPeople', 'post type general name', 'ukuu' ),
+		'singular_name'      => _x( 'Human', 'post type singular name', 'human' ),
+		'menu_name'          => _x( 'UkuuPeople', 'admin menu', 'your-plugin-textdomain' ),
+		'name_admin_bar'     => _x( 'Human', 'add new on admin bar', 'your-plugin-textdomain' ),
+		'add_new'            => _x( 'Add New', 'Human', 'your-plugin-textdomain' ),
+		'add_new_item'       => __( 'Add New Human', 'your-plugin-textdomain' ),
+		'new_item'           => __( 'New Human', 'your-plugin-textdomain' ),
+		'edit_item'          => __( 'Edit Human', 'your-plugin-textdomain' ),
+		'view_item'          => __( 'View Human', 'your-plugin-textdomain' ),
+		'all_items'          => __( 'People', 'your-plugin-textdomain' ),
+		'search_items'       => __( 'Search Human', 'your-plugin-textdomain' ),
+		'parent_item_colon'  => __( 'Parent text:', 'your-plugin-textdomain' ),
+		'not_found'          => __( 'No People found.', 'your-plugin-textdomain' ),
+		'not_found_in_trash' => __( 'No People found in Trash.', 'your-plugin-textdomain' )
+	);
+
+	$args = array(
+		'labels'             => $labels,
+		'public'             => true,
+		'publicly_queryable' => true,
+		'show_ui'            => true,
+		'show_in_menu'       => true,
+		'query_var'          => true,
+		'rewrite'            => array( ),
+		'capability_type'    => 'post',
+		'has_archive'        => true,
+		'hierarchical'       => false,
+		'menu_position'      => '',
+    'menu_icon'          => 'dashicons-admin-users',
+		'supports'           => array()
+	);
+
+  register_post_type( 'wp-type-contacts', $args );
+
+  $labels =  array(
+    'name'               => _x( 'Touchpoints', 'post type general name', 'touchpoint' ),
+    'singular_name'      => _x( 'Touchpoint', 'post type singular name', 'touchpoint' ),
+    'menu_name'          => _x( 'Touchpoints', 'admin menu', 'touchpoint-menu-name' ),
+    'name_admin_bar'     => _x( 'Touchpoints', 'add new on admin bar', 'touchpoint-menu-name' ),
+    'add_new'            => _x( 'Add New', 'Touchpoint', 'add-new-touchpoints' ),
+    'add_new_item'       => __( 'Add New Touchpoint', 'add-new-touchpoint' ),
+    'new_item'           => __( 'New Touchpoint', 'new-touchpoint' ),
+    'edit_item'          => __( 'Edit Touchpoint', 'edit-touchpoint' ),
+    'view_item'          => __( 'View Touchpoint', 'view-touchpoint' ),
+    'all_items'          => __( 'All Touchpoints', 'all-touchpoint' ),
+    'search_items'       => __( 'Search Touchpoints', 'search-touchpoints' ),
+    'parent_item_colon'  => __( 'Parent text:', 'parent-text' ),
+    'not_found'          => __( 'No Touchpoints found.', 'no-touchpoint-found' ),
+    'not_found_in_trash' => __( 'No Touchpoints found in Trash.', 'no-touchpoints-found-in-trash' )
+  );
+
+  $args = array(
+    'labels'             => $labels,
+    'public'             => true,
+    'publicly_queryable' => true,
+    'show_ui'            => true,
+    'show_in_menu'       => true,
+    'query_var'          => true,
+    'rewrite'            => array(),
+    'capability_type'    => 'post',
+    'has_archive'        => true,
+    'hierarchical'       => false,
+    'menu_position'      => '',
+    'supports'           => array( 'title' )
+  );
+
+  register_post_type( 'wp-type-activity', $args );
+
+
+	// create a new taxonomy
+	$labels = array(
+		'name'              => _x( 'Tribes', 'taxonomy general name' ),
+		'singular_name'     => _x( 'Tribe', 'taxonomy singular name' ),
+		'search_items'      => __( 'Search Tribe' ),
+		'all_items'         => __( 'All Tribe' ),
+		'parent_item'       => __( 'Parent Tribe' ),
+		'parent_item_colon' => __( 'Parent Tribe:' ),
+		'edit_item'         => __( 'Edit Tribe' ),
+		'update_item'       => __( 'Update Tribe' ),
+		'add_new_item'      => __( 'Add New Tribe' ),
+		'new_item_name'     => __( 'New Tribe Name' ),
+		'menu_name'         => __( 'Tribe' ),
+	);
+
+	$args = array(
+		'hierarchical'      => true,
+		'labels'            => $labels,
+		'show_ui'           => true,
+		'show_admin_column' => true,
+		'query_var'         => true,
+		'rewrite'           => array( ),
+	);
+
+	register_taxonomy( 'wp-type-group', array( 'wp-type-contacts' ), $args );
+
+	// create a new taxonomy
+	$labels = array(
+		'name'              => _x( 'Tags', 'taxonomy general name' ),
+		'singular_name'     => _x( 'Tag', 'taxonomy singular name' ),
+		'search_items'      => __( 'Search Tag' ),
+		'all_items'         => __( 'All Tag' ),
+		'parent_item'       => __( 'Parent Tag' ),
+		'parent_item_colon' => __( 'Parent Tag:' ),
+		'edit_item'         => __( 'Edit Tag' ),
+		'update_item'       => __( 'Update Tag' ),
+		'add_new_item'      => __( 'Add New Tag' ),
+		'new_item_name'     => __( 'New Tag Name' ),
+		'menu_name'         => __( 'Tag' ),
+	);
+
+	$args = array(
+		'hierarchical'      => true,
+		'labels'            => $labels,
+		'show_ui'           => true,
+		'show_admin_column' => true,
+		'query_var'         => true,
+		'rewrite'           => array( ),
+	);
+
+	register_taxonomy( 'wp-type-tags', array( 'wp-type-contacts' ), $args );
+
+	// create a new taxonomy
+	$labels = array(
+		'name'              => _x( 'Contact Types', 'taxonomy general name' ),
+		'singular_name'     => _x( 'Contact Type', 'taxonomy singular name' ),
+		'search_items'      => __( 'Search Contact Type' ),
+		'all_items'         => __( 'All Contact Type' ),
+		'parent_item'       => __( 'Parent Contact Type' ),
+		'parent_item_colon' => __( 'Parent Contact Type:' ),
+		'edit_item'         => __( 'Edit Contact Type' ),
+		'update_item'       => __( 'Update Contact Type' ),
+		'add_new_item'      => __( 'Add New Contact Type' ),
+		'new_item_name'     => __( 'New Contact Type Name' ),
+		'menu_name'         => __( 'Contact Type' ),
+	);
+
+	$args = array(
+		'hierarchical'      => true,
+		'labels'            => $labels,
+		'show_ui'           => true,
+		'show_admin_column' => true,
+		'query_var'         => true,
+		'rewrite'           => array( ),
+	);
+
+	register_taxonomy( 'wp-type-contacts-subtype', array( 'wp-type-contacts' ), $args );
+
+	// create a new taxonomy
+	$labels = array(
+		'name'              => _x( 'Touchpoint Types', 'taxonomy general name' ),
+		'singular_name'     => _x( 'Touchpoint Type', 'taxonomy singular name' ),
+		'search_items'      => __( 'Search Touchpoint Type' ),
+		'all_items'         => __( 'All Touchpoint Type' ),
+		'parent_item'       => __( 'Parent Touchpoint Type' ),
+		'parent_item_colon' => __( 'Parent Touchpoint Type:' ),
+		'edit_item'         => __( 'Edit Touchpoint Type' ),
+		'update_item'       => __( 'Update Touchpoint Type' ),
+		'add_new_item'      => __( 'Add New Touchpoint Type' ),
+		'new_item_name'     => __( 'New Touchpoint Type Name' ),
+		'menu_name'         => __( 'Touchpoint Type' ),
+	);
+
+	$args = array(
+		'hierarchical'      => true,
+		'labels'            => $labels,
+		'show_ui'           => true,
+		'show_admin_column' => true,
+		'query_var'         => true,
+		'rewrite'           => array( ),
+	);
+
+	register_taxonomy( 'wp-type-activity-types', array( 'wp-type-activity' ), $args );
+  	delete_option( 'simple_fields_groups' );
+}
+
+/**
+ * Define the metabox and field configurations.
+ */
+function ukuu_register_contact_metabox() {
+  $prefix = 'wpcf-';
+  $cmb_demo = new_cmb2_box( array(
+                'id'            => $prefix . 'group-edit-contact-info',
+                'title'         => __( 'Edit Contact Info', 'cmb2' ),
+                'object_types'  => array( 'wp-type-contacts', ), // Post type
+              ) );
+
+  $actual_fields = array(
+    0 => 'first-name',
+    1 => 'last-name',
+    2 => 'display-name',
+    3 => 'email',
+    4 => 'phone',
+    5 => 'mobile',
+    6 => 'website',
+    7 => 'contactimage',
+    8 => 'ukuu-job-title',
+    9 => 'ukuu-twitter-handle',
+    10 => 'ukuu-facebook-url',
+    11 => 'ukuu-date-of-birth',
+  );
+
+  add_fields( $actual_fields , $cmb_demo);
+}
+
+
+
+/**
+ * Define the metabox and field configurations.
+ */
+function ukuu_register_setting_metabox() {
+  $prefix = 'wpcf-';
+  $cmb_demo = new_cmb2_box( array(
+                'id'            => $prefix . 'group-edit_contact_privacy_settings',
+                'title'         => __( 'Edit Privacy Settings', 'cmb2' ),
+                'object_types'  => array( 'wp-type-contacts', ), // Post type
+              ) );
+
+  $actual_fields = array(
+    0 => 'privacy-settings',
+    1 => 'bulk-mailings',
+  );
+  add_fields( $actual_fields , $cmb_demo);
+}
+
+function ukuu_register_related_org_metabox(){
+  $prefix = 'wpcf-';
+  $cmb_demo = new_cmb2_box( array(
+                'id'            => $prefix . 'related-org-metabox',
+                'title'         => __( 'Related Organization', 'cmb2' ),
+                'object_types'  => array( 'wp-type-contacts', ), // Post type
+              ) );
+
+  $cmb_demo->add_field( array(
+      'name'             => __( 'select organization', 'cmb2' ),
+      'desc'             => __( '', 'cmb2' ),
+      'id'               => $prefix . 'related-org',
+      'type'             => 'select',
+      'show_option_none' => true,
+      'options'          => get_related_org_value(),
+    ) );
+}
+
+/**
+ * Define the metabox and field configurations.
+ */
+function ukuu_register_address_metabox() {
+  $prefix = 'wpcf-';
+  $cmb_demo = new_cmb2_box( array(
+                'id'            => $prefix . 'group-edit_contact_address',
+                'title'         => __( 'Edit Contact Address', 'cmb2' ),
+                'object_types'  => array( 'wp-type-contacts', ), // Post type
+              ) );
+
+  $actual_fields = array(
+    0 => 'streetaddress',
+    1 => 'streetaddress2',
+    2 => 'city',
+    3 => 'state',
+    4 => 'postalcode',
+    5 => 'country',
+  );
+  add_fields( $actual_fields , $cmb_demo);
+}
+
+/**
+ * Define the metabox and field configurations.
+ */
+function touchpoints_register_metabox() {
+  $prefix = 'wpcf-';
+  $activity_information = new_cmb2_box( array(
+                            'id'            => $prefix . 'group-activity-information',
+                            'title'         => __( 'Activity information', 'cmb2' ),
+                            'object_types'  => array( 'wp-type-activity', ), // Post type
+                          ) );
+
+  $actual_fields = array(
+    0 => 'startdate',
+    1 => 'enddate',
+    2 => 'status',
+    3 => 'details',
+    4 => 'attachments',
+  );
+  add_fields( $actual_fields , $activity_information);
+}
+
+function touchpoints_register_contacts_metabox() {
+  $prefix = 'wpcf-';
+
+  $touchpoint_contact = new_cmb2_box( array(
+                          'id'            => $prefix . 'post-relationship',
+                          'title'         => __( 'Touchpoint Contact', 'cmb2' ),
+                          'object_types'  => array( 'wp-type-activity' ,), // Post type
+                          'context'    => 'normal',
+                          'priority'   => 'high',
+                          'closed'     => true, // true to keep the metabox closed by default
+                        ) );
+
+  $touchpoint_contact->add_field( array(
+      'name'             => __( 'Human', 'cmb2' ),
+      'desc'             => __( 'This Touchpoint belongs to:', 'cmb2' ),
+      'id'               => $prefix . 'pr-belongs',
+      'type'             => 'select',
+      'show_option_none' => true,
+      'options'          => array(),
+    ) );
+
+}
+
+function touchpoints_register_assigned_to_metabox() {
+  $prefix = 'wpcf_';
+
+  $touchpoint_assigned = new_cmb2_box( array(
+                           'id'            => $prefix . 'touchpoint_assigned_metabox',
+                           'title'         => __( 'Assigned To', 'cmb2' ),
+                           'object_types'  => array( 'wp-type-activity' ,), // Post type
+                           'context'    => 'normal',
+                           'priority'   => 'high',
+                           'closed'     => true, // true to keep the metabox closed by default
+                         ) );
+
+  $touchpoint_assigned->add_field( array(
+      'name'             => __( 'Assigned to', 'cmb2' ),
+      'desc'             => __( '', 'cmb2' ),
+      'id'               => $prefix . 'assigned_to',
+      'type'             => 'select',
+      'show_option_none' => true,
+      'options'          => get_id_and_displayname(),
+      'repeatable'      => true,
+    ) );
+}
+
+function get_id_and_displayname() {
+  $args = array(
+    'fields' => 'ids',
+    'numberposts' => -1,
+    'orderby' => 'title',
+    'order' => 'ASC',
+    'post_status' => array( 'publish', 'private' ),
+    'post_type' => 'wp-type-contacts',
+    'suppress_filters' => 0,
+  );
+  $items = (array) get_posts($args);
+  $display_names = array();
+  foreach( $items as $item ) {
+    $display_name = get_post_meta($item, 'wpcf-display-name', true);
+    $display_names[$item] = $display_name;
+  }
+  $array_values = "";
+  foreach ( $display_names as $key => $values ) {
+    $array_values[$key] = __( $values, 'cmb2' );
+  }
+  if ( !empty( $array_values ) ) return $array_values;
+}
+
+function get_related_org_value() {
+  $args = array(
+    'fields' => 'ids',
+    'numberposts' => -1,
+    'orderby' => 'title',
+    'order' => 'ASC',
+    'post_status' => array( 'publish', 'private' ),
+    'post_type' => 'wp-type-contacts',
+    'suppress_filters' => 0,
+    'tax_query' => array(
+      array(
+        'taxonomy' => 'wp-type-contacts-subtype',
+        'field' => 'slug',
+        'terms' => 'wp-type-org-contact'
       )
     )
-  ),
+  );
+  $items = (array) get_posts($args);
+  $display_names = array();
+  foreach( $items as $item ) {
+    $display_name = get_post_meta($item, 'wpcf-display-name', true);
+    $display_names[$item] = $display_name;
+  }
+  $array_values = "";
+  foreach ( $display_names as $key => $values ) {
+    $array_values[$key] = __( $values, 'cmb2' );
+  }
+  if ( !empty( $array_values ) ) return $array_values;
+}
 
-  'custom_taxonomies' => array(
-    'wp-type-group' => array(
-      'labels' => array(
-        'name' => 'Tribes',
-        'singular_name' => 'Tribe',
-        'search_items' => 'Search %s',
-        'popular_items' => 'Popular %s',
-        'all_items' => 'All %s',
-        'parent_item' => 'Parent %s',
-        'parent_item_colon' => 'Parent %s:',
-        'edit_item' => 'Edit %s',
-        'update_item' => 'Update %s',
-        'add_new_item' => 'Add New %s',
-        'new_item_name' => 'New %s Name',
-        'separate_items_with_commas' => 'Separate %s with commas',
-        'add_or_remove_items' => 'Add or remove %s',
-        'choose_from_most_used' => 'Choose from the most used %s',
-        'menu_name' => '%s',
-      ),
-      'slug' => 'wp-type-group',
-      'description' => 'Wordpress groups for wp-conatcts',
-      'public' => 'public',
-      'supports' => array(
-        'wp-type-contacts' => 1,
-      ),
-      'hierarchical' => 'hierarchical',
-      'rewrite' => array(
-        'enabled' => 1,
-        'slug' => '',
-        'with_front' => 1,
-        'hierarchical' => 1,
-      ),
-      'show_ui' => 1,
-      'show_in_nav_menus' => 1,
-      'show_tagcloud' => 1,
-      'query_var_enabled' => 1,
-      'query_var' => '',
-      'update_count_callback' => '',
-    ),
-    'wp-type-tags' => array(
-      'labels' => array(
-        'name' => 'Tags',
-        'singular_name' => 'Tag',
-        'search_items' => 'Search %s',
-        'popular_items' => 'Popular %s',
-        'all_items' => 'All %s',
-        'parent_item' => 'Parent %s',
-        'parent_item_colon' => 'Parent %s:',
-        'edit_item' => 'Edit %s',
-        'update_item' => 'Update %s',
-        'add_new_item' => 'Add New %s',
-        'new_item_name' => 'New %s Name',
-        'separate_items_with_commas' => 'Separate %s with commas',
-        'add_or_remove_items' => 'Add or remove %s',
-        'choose_from_most_used' => 'Choose from the most used %s',
-        'menu_name' => '%s',
-      ),
-      'slug' => 'wp-type-tags',
-      'description' => 'Tags for wordpress contacts',
-      'public' => 'public',
-      'supports' => array(
-        'wp-type-contacts' => 1,
-      ),
-      'hierarchical' => 'flat',
-      'rewrite' => array(
-        'enabled' => 1,
-        'slug' => '',
-        'with_front' => 1,
-        'hierarchical' => 1,
-      ),
+function add_fields( $actual_fields , $cmb_demo) {
+  global $customterm;
+  foreach ( $customterm['fields'] as $key => $value ){
+    if ( in_array($key , $actual_fields) )
+      $cmb_demo->add_field( $value );
+  }
+}
 
-      'show_ui' => 1,
-      'show_in_nav_menus' => 1,
-      'show_tagcloud' => 1,
-      'query_var_enabled' => 1,
-      'query_var' => '',
-      'update_count_callback' => '',
-    ),
-    'wp-type-contacts-subtype' => array(
-      'labels' => array(
-        'name' => 'Contact Types',
-        'singular_name' => 'Contact Type',
-        'search_items' => 'Search %s',
-        'popular_items' => 'Popular %s',
-        'all_items' => 'All %s',
-        'parent_item' => 'Parent %s',
-        'parent_item_colon' => 'Parent %s:',
-        'edit_item' => 'Edit %s',
-        'update_item' => 'Update %s',
-        'add_new_item' => 'Add New %s',
-        'new_item_name' => 'New %s Name',
-        'separate_items_with_commas' => 'Separate %s with commas',
-        'add_or_remove_items' => 'Add or remove %s',
-        'choose_from_most_used' => 'Choose from the most used %s',
-        'menu_name' => '%s',
-      ),
-      'slug' => 'wp-type-contacts-subtype',
-      'description' => 'Contact types for user/wp contacts eg Individual, organization, etc.',
-      'public' => 'public',
-      'supports' => array(
-        'wp-type-contacts' => 1,
-      ),
-      'hierarchical' => 'hierarchical',
-      'rewrite' => array(
-        'enabled' => 1,
-        'slug' => '',
-        'with_front' => 1,
-        'hierarchical' => 1,
-      ),
-
-      'show_ui' => 1,
-      'show_in_nav_menus' => 1,
-      'show_tagcloud' => 1,
-      'query_var_enabled' => 1,
-      'query_var' => '',
-      'update_count_callback' => '',
-    ),
-    'wp-type-activity-types' => array(
-      'labels' => array(
-        'name' => 'Touchpoint Types',
-        'singular_name' => 'Touchpoint Type',
-        'search_items' => 'Search %s',
-        'popular_items' => 'Popular %s',
-        'all_items' => 'All %s',
-        'parent_item' => 'Parent %s',
-        'parent_item_colon' => 'Parent %s:',
-        'edit_item' => 'Edit %s',
-        'update_item' => 'Update %s',
-        'add_new_item' => 'Add New %s',
-        'new_item_name' => 'New %s Name',
-        'separate_items_with_commas' => 'Separate %s with commas',
-        'add_or_remove_items' => 'Add or remove %s',
-        'choose_from_most_used' => 'Choose from the most used %s',
-        'menu_name' => '%s',
-      ),
-      'slug' => 'wp-type-activity-types',
-      'description' => 'Touchpoint types',
-      'public' => 'public',
-      'supports' => array(
-        'wp-type-activity' => 1,
-      ),
-      'hierarchical' => 'hierarchical',
-      'rewrite' => array(
-        'enabled' => 1,
-        'slug' => '',
-        'with_front' => 1,
-        'hierarchical' => 1,
-      ),
-
-      'show_ui' => 1,
-      'show_in_nav_menus' => 1,
-      'show_tagcloud' => 1,
-      'query_var_enabled' => 1,
-      'query_var' => '',
-      'update_count_callback' => '',
-    )
-  ),
-
-  'fields' =>array(
-    'first-name' => array(
-      'id' => 'first-name',
-      'slug' => 'first-name',
-      'type' => 'textfield',
-      'name' => 'First Name',
-      'description' => '',
-      'data' => array(
-        'repetitive' => 0,
-        'validate' => array(
-          'required' => array(
-            'active' => 1,
-            'value' => true,
-            'message' => 'This field is required',
-          ),
-        ),
-        'conditional_display' => array(),
-        'disabled_by_type' => 0,
-      ),
-      'meta_key' => 'wpcf-first-name',
-      'meta_type' => 'postmeta',
-    ),
-    'last-name' => array(
-      'id' => 'last-name',
-      'slug' => 'last-name',
-      'type' => 'textfield',
-      'name' => 'Last Name',
-      'description' => '',
-      'data' => array(
-        'repetitive' => 0,
-        'validate' => array(
-          'required' => array(
-            'active' => 1,
-            'value' => true,
-            'message' => 'This field is required',
-          ),
-        ),
-        'conditional_display' => array(),
-        'disabled_by_type' => 0,
-      ),
-      'meta_key' => 'wpcf-last-name',
-      'meta_type' => 'postmeta',
-    ),
-    'display-name' => array(
-      'id' => 'display-name',
-      'slug' => 'display-name',
-      'type' => 'textfield',
-      'name' => 'Display Name',
-      'description' => '',
-      'data' => array(
-        'repetitive' => 0,
-        'validate' => array(
-        ),
-        'conditional_display' => array(),
-        'disabled_by_type' => 0,
-      ),
-      'meta_key' => 'wpcf-display-name',
-      'meta_type' => 'postmeta',
-    ),
-    'email' => array(
-      'id' => 'email',
-      'slug' => 'email',
-      'type' => 'email',
-      'name' => 'Email',
-      'description' => '',
-      'data' => array(
-        'repetitive' => 0,
-        'validate' => array(
-          'required' => array(
-            'active' => 1,
-            'value' => true,
-            'message' => 'This field is required',
-          ),
-          'email' => array(
-            'active' => 1,
-            'message' => 'Please enter a valid email address',
-          ),
-        ),
-        'conditional_display' => array(),
-        'disabled_by_type' => 0,
-      ),
-      'meta_key' => 'wpcf-email',
-      'meta_type' => 'postmeta',
-    ),
-    'phone' => array(
-      'id' => 'phone',
-      'slug' => 'phone',
-      'type' => 'phone',
-      'name' => 'Phone',
-      'description' => '',
-      'data' => array(
-        'repetitive' => 0,
-        'validate' => array(
-        ),
-        'conditional_display' => array(),
-        'disabled_by_type' => 0,
-      ),
-      'meta_key' => 'wpcf-phone',
-      'meta_type' => 'postmeta',
-    ),
-    'mobile' => array(
-      'id' => 'mobile',
-      'slug' => 'mobile',
-      'type' => 'numeric',
-      'name' => 'Mobile',
-      'description' => '',
-      'data' => array(
-        'repetitive' => 0,
-        'validate' => array(
-          'number' => array( 'active' => 1 , 'message' => 'This field should be numeric' ),
-        ),
-        'conditional_display' => array(),
-        'disabled_by_type' => 0,
-      ),
-      'meta_key' => 'wpcf-mobile',
-      'meta_type' => 'postmeta',
-    ),
-    'website' => array(
-      'id' => 'website',
-      'slug' => 'website',
-      'type' => 'textfield',
-      'name' => 'Website',
-      'description' => '',
-      'data' => array(
-        'repetitive' => 0,
-        'validate' => array(),
-        'conditional_display' => array(),
-        'disabled_by_type' => 0,
-      ),
-      'meta_key' => 'wpcf-website',
-      'meta_type' => 'postmeta',
-    ),
-    'ukuu-job-title' => array(
-      'id' => 'ukuu-job-title',
-      'name' => 'Job Title',
-      'slug' => 'ukuu-job-title',
-      'type' => 'textfield',
-      'description' => '',
-      'data' => array(
-        'repetitive' => 0,
-        'validate' => array(),
-        'conditional_display' => array(),
-        'disabled_by_type' => 0,
-      ),
-      'meta_key' => 'wpcf-ukuu-job-title',
-      'meta_type' => 'postmeta',
-    ),
-    'ukuu-twitter-handle' => array(
-      'id' => 'ukuu-twitter-handle',
-      'name' => 'Twitter Handle',
-      'slug' => 'ukuu-twitter-handle',
-      'type' => 'textfield',
-      'description' => '',
-      'data' => array(
-        'repetitive' => 0,
-        'validate' => array(),
-        'conditional_display' => array(),
-        'disabled_by_type' => 0,
-      ),
-      'meta_key' => 'wpcf-ukuu-twitter-handle',
-      'meta_type' => 'postmeta',
-    ),
-    'ukuu-facebook-url' => array(
-      'id' => 'ukuu-facebook-url',
-      'name' => 'Facebook URL',
-      'slug' => 'ukuu-facebook-url',
-      'type' => 'url',
-      'description' => '',
-      'data' => array(
-        'repetitive' => 0,
-        'validate' => array(
-          'url' => array(
-            'active' => 1,
-            'value' => true,
-            'message' => 'Please enter a valid URL address',
-          ),
-        ),
-        'disabled_by_type' => 0,
-        'conditional_display' => array(),
-      ),
-      'meta_key' => 'wpcf-ukuu-facebook-url',
-      'meta_type' => 'postmeta',
-    ),
-    'ukuu-date-of-birth' => array(
-      'id' => 'ukuu-date-of-birth',
-      'name' => 'Date Of Birth',
-      'slug' => 'ukuu-date-of-birth',
-      'type' => 'date',
-      'description' => '',
-      'data' => array(
-        'date_and_time' => 'date',
-        'repetitive' => 0,
-        'validate' => array(
-          'date' => array(
-            'active' => 1 ,
-            'format' => 'mdy',
-            'pattern' => 'check.format',
-            'message' => 'please enter a valid date',
-          ),
-        ),
-        'conditional_display' => array(),
-        'disabled_by_type' => 0,
-      ),
-      'meta_key' => 'wpcf-ukuu-date-of-birth',
-      'meta_type' => 'postmeta',
-    ),
-    'streetaddress' => array(
-      'id' => 'streetaddress',
-      'slug' => 'streetaddress',
-      'type' => 'textfield',
-      'name' => 'Street Address',
-      'description' => '',
-      'data' => array(
-        'repetitive' => 0,
-        'validate' => array(),
-        'conditional_display' => array(),
-        'disabled_by_type' => 0,
-      ),
-      'meta_key' => 'wpcf-streetaddress',
-      'meta_type' => 'postmeta',
-    ),
-    'streetaddress2' => array(
-      'id' => 'streetaddress2',
-      'slug' => 'streetaddress2',
-      'type' => 'textfield',
-      'name' => 'Street Address Line 2',
-      'description' => '',
-      'data' => array(
-        'repetitive' => 0,
-        'validate' => array(),
-        'conditional_display' => array(),
-        'disabled_by_type' => 0,
-      ),
-      'meta_key' => 'wpcf-streetaddress2',
-      'meta_type' => 'postmeta',
-    ),
-    'city' => array(
-      'id' => 'city',
-      'slug' => 'city',
-      'type' => 'textfield',
-      'name' => 'City',
-      'description' => '',
-      'data' => array(
-        'repetitive' => 0,
-        'validate' => array(),
-        'conditional_display' => array(),
-        'disabled_by_type' => 0,
-      ),
-      'meta_key' => 'wpcf-city',
-      'meta_type' => 'postmeta',
-    ),
-    'postalcode' => array(
-      'id' => 'postalcode',
-      'slug' => 'postalcode',
-      'type' => 'textfield',
-      'name' => 'Postal code',
-      'description' => '',
-      'data' => array(
-        'repetitive' => 0,
-        'validate' => array(),
-        'conditional_display' => array(),
-        'disabled_by_type' => 0,
-      ),
-      'meta_key' => 'wpcf-postalcode',
-      'meta_type' => 'postmeta',
-    ),
-    'country' => array(
-      'id' => 'country',
-      'slug' => 'country',
-      'type' => 'textfield',
-      'name' => 'Country',
-      'description' => '',
-      'data' => array(
-        'repetitive' => 0,
-        'validate' => array(),
-        'conditional_display' => array(),
-        'disabled_by_type' => 0,
-      ),
-      'meta_key' => 'wpcf-country',
-      'meta_type' => 'postmeta',
-    ),
-    'state' => array(
-      'id' => 'state',
-      'slug' => 'state',
-      'type' => 'textfield',
-      'name' => 'State',
-      'description' => '',
-      'data' => array(
-        'repetitive' => 0,
-        'validate' => array(),
-        'conditional_display' => array(),
-        'disabled_by_type' => 0,
-      ),
-      'meta_key' => 'wpcf-state',
-      'meta_type' => 'postmeta',
-    ),
-    'contactimage' => array(
-      'id' => 'contactimage',
-      'slug' => 'contactimage',
-      'type' => 'image',
-      'name' => 'Contact Image',
-      'description' => '',
-      'data' => array(
-        'repetitive' => 0,
-        'validate' => array(),
-        'conditional_display' => array(),
-        'disabled_by_type' => 0,
-      ),
-      'meta_key' => 'wpcf-contactimage',
-      'meta_type' => 'postmeta',
-    ),
-    'privacy-settings' => array(
-      'id' => 'privacy-settings',
-      'slug' => 'privacy-settings',
-      'type' => 'checkboxes',
-      'name' => 'Preferred Contact Method',
-      'description' => '',
-      'data' => array(
-        'save_empty' => 'no',
-        'options' => array('wpcf-fields-checkboxes-option-1' => array('title' => 'Phone' , 'set_value' => 'do_not_phone' , 'display' => 'value', 'display_value_not_selected' => '', 'display_value_selected' => 'Phone') ,'wpcf-fields-checkboxes-option-2' => array('title' => 'Email' , 'set_value' => 'do_not_email' , 'display' => 'value', 'display_value_not_selected' => '', 'display_value_selected' => 'Email'),'wpcf-fields-checkboxes-option-3' => array('title' => 'Mail' , 'set_value' => 'do_not_mail' , 'display' => 'db'),'wpcf-fields-checkboxes-option-3' => array('title' => 'SMS' , 'set_value' => 'do_not_sms' , 'display' => 'value', 'display_value_not_selected' => '', 'display_value_selected' => 'SMS') ),
-        'conditional_display' => array(),
-        'disabled_by_type' => 0,
-      ),
-      'meta_key' => 'wpcf-priority',
-      'meta_type' => 'postmeta',
-    ),
-    'bulk-mailings' => array(
-      'id' => 'bulk-mailings',
-      'slug' => 'bulk-mailing',
-      'type' => 'checkboxes',
-      'name' => 'Bulk Mailings',
-      'description' => '',
-      'data' => array(
-        'save_empty' => 'no',
-        'options' => array('wpcf-fields-checkboxes-option-1' => array('title' => 'Opt Out' , 'set_value' => 'opt_out' , 'display' => 'value', 'display_value_not_selected' => '', 'display_value_selected' => 'Opt Out') ),
-        'conditional_display' => array(),
-        'disabled_by_type' => 0,
-      ),
-      'meta_key' => 'wpcf-priority',
-      'meta_type' => 'postmeta',
-    ),
-    'startdate' => array(
-      'id' => 'startdate',
-      'slug' => 'startdate',
-      'type' => 'date',
-      'name' => 'Start Date',
-      'description' => '',
-      'data' => array(
-        'repetitive' => 0,
-        'date_and_time' => 'and_time',
-        'validate' => array(
-          'required' => array(
-            'active' => 1,
-            'value' => true,
-            'message' => 'This field is required',
-          ),
-          'date' => array(
-            'active' => 1 ,
-            'format' => 'mdy',
-            'pattern' => 'check.format',
-            'message' => 'please enter a valid date',
-          ),
-        ),
-        'conditional_display' => array(),
-        'disabled_by_type' => 0,
-      ),
-      'meta_key' => 'wpcf-startdate',
-      'meta_type' => 'postmeta',
-    ),
-    'enddate' => array(
-      'id' => 'enddate',
-      'slug' => 'enddate',
-      'type' => 'date',
-      'name' => 'End Date',
-      'description' => '',
-      'data' => array(
-        'repetitive' => 0,
-        'date_and_time' => 'and_time',
-        'validate' => array(
-          'required' => array(
-            'active' => 1,
-            'value' => true,
-            'message' => 'This field is required',
-          ),
-          'date' => array(
-            'active' => 1 ,
-            'format' => 'mdy',
-            'pattern' => 'check.format',
-            'message' => 'please enter a valid date',
-          ),
-        ),
-        'conditional_display' => array(),
-        'disabled_by_type' => 0,
-      ),
-      'meta_key' => 'wpcf-enddate',
-      'meta_type' => 'postmeta',
-    ),
-    'status' => array(
-      'id' => 'status',
-      'slug' => 'status',
-      'type' => 'select',
-      'name' => 'Status',
-      'description' => '',
-      'data' => array(
-        'repetitive' => 0,
-        'options' => array('1' => array('title' => 'Scheduled' , 'value' => 'scheduled') , 'default' => 1 ,'2' => array('title' => 'Completed' , 'value' => 'completed'),'3' => array('title' => 'Cancelled' , 'value' => 'cancelled')  ),
-        'validate' => array(
-          'required' => array(
-            'active' => 1,
-            'value' => true,
-            'message' => 'This field is required',
-          ),
-        ),
-        'conditional_display' => array(),
-        'disabled_by_type' => 0,
-      ),
-      'meta_key' => 'wpcf-status',
-      'meta_type' => 'postmeta',
-    ),
-    'details' => array(
-      'id' => 'details',
-      'slug' => 'details',
-      'type' => 'textarea',
-      'name' => 'Details',
-      'description' => '',
-      'data' => array(
-        'repetitive' => 0,
-        'validate' => array(
-        ),
-        'conditional_display' => array(),
-        'disabled_by_type' => 0,
-      ),
-      'meta_key' => 'wpcf-details',
-      'meta_type' => 'postmeta',
-    ),
-    'attachments' => array(
-      'id' => 'attachments',
-      'slug' => 'attachments',
-      'type' => 'file',
-      'name' => 'Attachments',
-      'description' => '',
-      'data' => array(
-        'repetitive' => 0,
-        'validate' => array(
-        ),
-        'conditional_display' => array(),
-        'disabled_by_type' => 0,
-      ),
-      'meta_key' => 'wpcf-attachments',
-      'meta_type' => 'postmeta',
-    ),
-  ),
-
-  "field_groups" => array(
-    "1" => array(
-      "id" => 1,
-      "key" => 'wp_activity_contacts',
-      "slug" => 'wp_activity_contacts',
-      "name" => 'Assigned to',
-      "description" => 'Contacts reference field',
-      "repeatable" => 1,
-      "fields" => array(
-        "1" => array(
-          "name" => 'Assigned to',
-          "slug" => 'wp_activity_assigned_contact',
-          "description" => '',
-          "type" => 'post',
-          "options" => array(
-            "divider" => array(
-              "appearance" => 'line',
-            ),
-            "date_v2" => array(
-              "show_as" => 'date',
-              "show" => 'always',
-              "default_date" => 'no_date',
-            ),
-            "text" => array(
-              "subtype" => 'text',
-              "placeholder" => '',
-              "attributes" => '',
-            ),
-            "textarea" => array(
-              "placeholder" => '',
-            ),
-          ),
-          "type_textarea_options" => array(
-            "size_height" => 'default',
-          ),
-          "type_post_options" => array(
-            "enabled_post_types" => array(
-              "0" => 'wp-type-contacts',
-            ),
-            "additional_arguments" => 'post_status=publish,private',
-            "enable_extended_return_values" => 1,
-          ),
-          "type_taxonomyterm_options" => array(
-            "additional_arguments" => '',
-          ),
-          "type_dropdown_options" => array(
-            "enable_multiple" => 0,
-          ),
-          "id" => 1,
-          "deleted" => 0,
-          "field_group" => array(
-            "id" => 1,
-            "name" => 'Assigned to',
-            "slug" => 'wp_activity_contacts',
-            "description" => 'wp-contacts reference field',
-            "repeatable" => 1,
-            "fields_count" => 1,
-          ),
-        ),
-      ),
-      "fields_by_slug" => array(
-        "assigned to" => array(
-          "slug" => 'assigned',
-          "name" => 'Assigned to',
-          "description" => '',
-          "type" => 'post',
-          "options" => array(
-            "post" => array(
-              "enabled_post_types" => array(
-                "0" => 'wp-type-contacts',
-              ),
-              "values" => array( ),
-              "additional_arguments" => '',
-              "enable_extended_return_values" => 1,
-            ),
-          ),
-          "id" => 0,
-          "type_post_options" => array(
-            "enabled_post_types" => array(
-              "0" => 'wp-type-contacts',
-            ),
-            "additional_arguments" => '',
-            "enable_extended_return_values" => 1,
-          ),
-          "type_taxonomyterm_options" => array(
-            "additional_arguments" => '',
-          ),
-          "deleted" => 0,
-        ),
-      ),
-      "deleted" => '',
-      "gui_view" => 'list',
-      "added_with_code" => 1,
-      "fields_count" => 1,
-    ),
-    "2" => array(
-      "id" => 2,
-      "key" => 'wp_type_contacts_org_relation',
-      "slug" => 'wp_type_contacts_org_relation',
-      "name" => 'Related Organization',
-      "description" => '',
-      "repeatable" => '',
-      "fields" => array(
-        "0" => array(
-          "name" => 'Organization',
-          "slug" => 'wp_type_conatcts_org',
-          "description" => 'Organization term description',
-          "type" => 'post',
-          "options" => array(
-            "divider" => array(
-              "appearance" => 'line',
-            ),
-            "date_v2" => array(
-              "show_as" => 'date',
-              "show" => 'always',
-              "default_date" => 'no_date',
-            ),
-            "text" => array(
-              "subtype" => 'text',
-              "placeholder" => '',
-              "attributes" => '',
-            ),
-            "textarea" => array(
-              "placeholder" => '',
-            ),
-          ),
-          "type_textarea_options" => array(
-            "size_height" => 'default',
-          ),
-          "type_post_options" => array(
-            "enabled_post_types" => array(
-              "0" => 'wp-type-contacts',
-            ),
-            "additional_arguments" => 'wp-type-contacts-subtype=wp-type-org-contact&post_status=publish,private',
-            "enable_extended_return_values" => 1,
-          ),
-          "type_taxonomyterm_options" => array(
-            "additional_arguments" => '',
-          ),
-          "type_dropdown_options" => array(
-            "enable_multiple" => 0,
-          ),
-          "id" => 0,
-          "deleted" => 0,
-          "field_group" => array(
-            "id" => 2,
-            "name" => 'Related Organization',
-            "slug" => 'wp_type_contacts_org_relation',
-            "description" => '',
-            "repeatable" => '',
-            "fields_count" => 1,
-          ),
-        ),
-      ),
-      "fields_by_slug" => array(
-        "organization" => array(
-          "slug" => 'organization',
-          "name" => 'Organization',
-          "description" => 'Organization term description',
-          "type" => 'post',
-          "options" => array(
-            "post" => array(
-              "enabled_post_types" => array(
-                "0" => 'wp-type-contacts',
-              ),
-              "values" => array( ),
-              "additional_arguments" => '',
-              "enable_extended_return_values" => 1,
-            ),
-          ),
-          "id" => 0,
-          "type_post_options" => array(
-            "enabled_post_types" => array(
-              "0" => 'wp-type-contacts',
-            ),
-            "additional_arguments" => '',
-            "enable_extended_return_values" => 1,
-          ),
-          "type_taxonomyterm_options" => array(
-            "additional_arguments" => '',
-          ),
-          "deleted" => 0,
-        ),
-      ),
-      "deleted" => '',
-      "gui_view" => 'list',
-      "added_with_code" => 1,
-      "fields_count" => 1,
-    ),
-  ),
-  "post_connectors" => array(
-    "1" => array(
-      "id" => 1,
-      "key" => 'wp_type_activity_related_fields',
-      "slug" => 'wp_type_activity_related_fields',
-      "name" => 'Activity related fields',
-      "field_groups" => array(
-        "1" => array(
-          "id" => 1,
-          "name" => 'Activity Contacts',
-          "deleted" => 0,
-          "context" => 'normal',
-          "priority" => 'low',
-        ),
-      ),
-      "post_types" => array(
-        "0" => 'wp-type-activity',
-      ),
-      "deleted" => '',
-      "hide_editor" => 1,
-      "added_with_code" => '',
-      "field_groups_count" => 2,
-    ),
-    "2" => array(
-      "id" => 2,
-      "key" => 'wp_type_contacts_related_fields',
-      "slug" => 'wp_type_contacts_related_fields',
-      "name" => 'Contacts related fields',
-      "field_groups" => array(
-        "2" => array(
-          "id" => 2,
-          "name" => 'Related Organization',
-          "deleted" => 0,
-          "context" => 'normal',
-          "priority" => 'low',
-        ),
-      ),
-      "post_types" => array(
-        "0" => 'wp-type-contacts',
-      ),
-      "deleted" => '',
-      "hide_editor" => '',
-      "added_with_code" => '',
-      "field_groups_count" => 2,
-    ),
-  ),
-  "post_type_defaults" => array(
-    "wp-type-activity" => 1,
-    "wp-type-contacts" => 2,
-  ),
-
-);
+function update_date_picker_defaults( $l10n ) {
+  $l10n['defaults']['date_picker']['yearRange'] = '1900:+10';
+  return $l10n;
+}

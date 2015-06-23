@@ -1,10 +1,10 @@
-﻿=== UkuuPeople - The Simple CRM ===
-Contributors: nathanporter, marisqa, stephen.lobo, tonymazz, kurund, nileemaj, yogeshnipane
+=== UkuuPeople - The Simple CRM ===
+Contributors: nathanporter, marisaporter, stephenlobo, tonymazz, kurund, nileemaJ, yogeshnipane
 Donate Link: http://ukuupeople.com
 Tags: crm, contact, customer, client, relationship manager, wordpress crm, nonprofit, mailchimp, marketing, sales, email, list building, fundraising, donations
 Requires at least: 3.8
 Tested up to: 4.2
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -117,7 +117,7 @@ Do you have questions or issues with UKUU PEOPLE? Use these support channels to 
 
 1. WordPress dashboard with UkuuPeople dashlets.
 2. UkuuPeople contact listing.
-3. UkuuPeople contact dashboad (includes contributions - add-on required).
+3. UkuuPeople contact dashboad (includes contribution display - add-on required).
 4. UkuuPeople TouchPoints listing.
 
 == Changelog ==
@@ -134,6 +134,9 @@ Fix stability issues and backwards compatibility to PHP 5.3
 Bug fixes and improvements
 gravatar integration for contact images
 
+= 1.0.3 =
+Remove plugin dependencies and streamline install process.
+
 == Upgrade Notice ==
 
 = 1.0.0 =
@@ -141,3 +144,6 @@ Launch - UkuuPeople is the simplest CRM tool for WordPress!
 
 = 1.0.2 =
 We've made your contact record even easier to create and maintain by adding gravatar support and additional contact meta fields for "Job Title, Social Media, Date of Birth"
+
+= 1.0.3 = 
+We've removed the plugin dependencies on Types and Simple Fields. This should reduce plugin conflicts and make youre life easier!
