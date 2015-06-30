@@ -1,10 +1,10 @@
-﻿=== UkuuPeople - The Simple CRM ===
+=== UkuuPeople - The Simple CRM ===
 Contributors: nathanporter, marisaporter, stephenlobo, tonymazz, kurund, nileemaJ, yogeshnipane
 Donate Link: http://ukuupeople.com
 Tags: crm, contact, customer, client, relationship manager, wordpress crm, nonprofit, mailchimp, marketing, sales, email, list building, fundraising, donations
 Requires at least: 3.8
 Tested up to: 4.2
-Stable tag: 1.0.4
+Stable tag: 1.0.3
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -137,9 +137,6 @@ gravatar integration for contact images
 = 1.0.3 =
 Remove plugin dependencies and streamline install process.
 
-= 1.0.4 = 
-Fixes issue where plugin was forcing Wordpress to use UK English translation. Locale is used only for activity post type.
-
 == Upgrade Notice ==
 
 = 1.0.0 =
@@ -150,6 +147,3 @@ We've made your contact record even easier to create and maintain by adding grav
 
 = 1.0.3 = 
 We've removed the plugin dependencies on Types and Simple Fields. This should reduce plugin conflicts and make youre life easier!
-
-= 1.0.4 = 
-Fixes issue where plugin was forcing Wordpress to use UK English translation.
