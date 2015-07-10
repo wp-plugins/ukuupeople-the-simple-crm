@@ -1,10 +1,10 @@
-﻿=== Simple WordPress CRM - UkuuPeople ===
-Contributors: nathanporter, marisaporter, stephenlobo, tonymazz, kurund, nileemaJ, yogeshnipane
+=== Simple WordPress CRM - UkuuPeople ===
+Contributors: nathanporter, marisaporter, stephenlobo, tonymazz, nileemaJ, yogeshnipane
 Donate Link: http://ukuupeople.com
 Tags: crm, contact, customer, client, relationship manager, wordpress crm, nonprofit, mailchimp, marketing, sales, email, list building, fundraising, donations
 Requires at least: 3.8
 Tested up to: 4.2
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -23,7 +23,7 @@ UkuuPeople is the easiest CRM tool for WordPress. It effortlessly ties all of yo
 
 * Integrations. Extending the awesome.
 
-* Dashlets. Quick ways to interact with CRM data—personalized for you. 
+* Dashlets. Quick ways to interact with CRM data—personalized for you.
 
 
 = UkuuPeople Features: =
@@ -69,8 +69,8 @@ Go conquer the world!
 
 = Docs & Support =
 
-You can find docs, FAQ and more detailed information about UkuuPeople on (http://ukuupeople.com/). 
-If you were unable to find the answer to your question on the FAQ or in any of the documentation, you should check the [support knowledgebase](http://support.ukuupeople.com/). 
+You can find docs, FAQ and more detailed information about UkuuPeople on (http://ukuupeople.com/).
+If you were unable to find the answer to your question on the FAQ or in any of the documentation, you should check the [support knowledgebase](http://support.ukuupeople.com/).
 
 = Translators =
 
@@ -92,7 +92,7 @@ Automatic installation is the easiest option as WordPress handles the file trans
 
 In the search field type "UkuuPeople" and click Search Plugins. Once you have found the plugin you can view details about it such as the the point release, rating and description. Most importantly of course, you can install it by simply clicking "Install Now".
 
-= Manual Installation = 
+= Manual Installation =
 
 1. Download the plugins from: http://ukuupeople.com/
 2. Upload plugin files to your plugins folder.
@@ -119,31 +119,3 @@ Do you have questions or issues with UKUU PEOPLE? Use these support channels to 
 2. UkuuPeople contact listing.
 3. UkuuPeople contact dashboad (includes contribution display - add-on required).
 4. UkuuPeople TouchPoints listing.
-
-== Changelog ==
-
-For more information, see [Releases](http://ukuupeople.com/).
-
-= 1.0.0 =
-Launch!
-
-= 1.0.1 =
-Fix stability issues and backwards compatibility to PHP 5.3
-
-= 1.0.2 =
-Bug fixes and improvements
-gravatar integration for contact images
-
-= 1.0.3 =
-Remove plugin dependencies and streamline install process.
-
-== Upgrade Notice ==
-
-= 1.0.0 =
-Launch - UkuuPeople is the simplest CRM tool for WordPress! 
-
-= 1.0.2 =
-We've made your contact record even easier to create and maintain by adding gravatar support and additional contact meta fields for "Job Title, Social Media, Date of Birth"
-
-= 1.0.3 = 
-We've removed the plugin dependencies on Types and Simple Fields. This should reduce plugin conflicts and make youre life easier!
