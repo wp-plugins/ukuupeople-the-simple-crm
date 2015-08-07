@@ -3,8 +3,8 @@ $prefix = 'wpcf-';
 $customterm = array(
   'fields' =>array(
     'first-name' => array(
-      'name' => __( 'First Name*', 'cmb2' ),
-      'desc' => __( '', 'cmb2' ),
+      'name' => __( 'First Name*', 'UkuuPeople' ),
+      'desc' => __( '',  'UkuuPeople' ),
       'id'   => $prefix . 'first-name',
       'type' => 'text_medium',
       'attributes'  => array(
@@ -12,8 +12,8 @@ $customterm = array(
       ),
     ) ,
     'last-name' =>array(
-      'name' => __( 'Last Name*', 'cmb2' ),
-      'desc' => __( '', 'cmb2' ),
+      'name' => __( 'Last Name*', 'UkuuPeople' ),
+      'desc' => __( '', 'UkuuPeople' ),
       'id'   => $prefix . 'last-name',
       'type' => 'text_medium',
       'attributes'  => array(
@@ -21,14 +21,14 @@ $customterm = array(
       ),
     ),
     'display-name' => array(
-      'name' => __( 'Display Name', 'cmb2' ),
-      'desc' => __( '', 'cmb2' ),
+      'name' => __( 'Display Name', 'UkuuPeople' ),
+      'desc' => __( '', 'UkuuPeople' ),
       'id'   => $prefix . 'display-name',
       'type' => 'text_medium',
     ) ,
     'email' => array(
-      'name' => __( 'Email*', 'cmb2' ),
-      'desc' => __( '', 'cmb2' ),
+      'name' => __( 'Email*', 'UkuuPeople' ),
+      'desc' => __( '', 'UkuuPeople' ),
       'id'   => $prefix . 'email',
       'type' => 'text_email',
       'attributes'  => array(
@@ -36,116 +36,122 @@ $customterm = array(
       ),
     ),
     'phone' => array(
-      'name' => __( 'Phone', 'cmb2' ),
-      'desc' => __( '', 'cmb2' ),
+      'name' => __( 'Phone', 'UkuuPeople' ),
+      'desc' => __( '',  'UkuuPeople' ),
       'id'   => $prefix . 'phone',
       'type' => 'text_medium',
     ) ,
     'mobile' => array(
-      'name' => __( 'Mobile', 'cmb2' ),
-      'desc' => __( '', 'cmb2' ),
+      'name' => __( 'Mobile', 'UkuuPeople' ),
+      'desc' => __( '', 'UkuuPeople' ),
       'id'   => $prefix . 'mobile',
       'type' => 'text_medium',
     ) ,
     'website' =>array(
-      'name' => __( 'Website', 'cmb2' ),
-      'desc' => __( '', 'cmb2' ),
+      'name' => __( 'Website', 'UkuuPeople' ),
+      'desc' => __( '',  'UkuuPeople' ),
       'id'   => $prefix . 'website',
       'type' => 'text_url',
     ) ,
     'contactimage' => array(
-      'name' => __( 'Contact Image', 'cmb2' ),
-      'desc' => __( '', 'cmb2' ),
+      'name' => __( 'Contact Image', 'UkuuPeople' ),
+      'desc' => __( '', 'UkuuPeople' ),
       'id'   => $prefix . 'contactimage',
       'type' => 'file',
     ) ,
     'ukuu-job-title' => array(
-      'name' => __( 'Job Title', 'cmb2' ),
-      'desc' => __( '', 'cmb2' ),
+      'name' => __( 'Job Title', 'UkuuPeople' ),
+      'desc' => __( '', 'UkuuPeople' ),
       'id'   => $prefix . 'ukuu-job-title',
       'type' => 'text_medium',
     ) ,
     'ukuu-twitter-handle' => array(
-      'name' => __( 'Twitter Handle', 'cmb2' ),
-      'desc' => __( '', 'cmb2' ),
+      'name' => __( 'Twitter Handle', 'UkuuPeople' ),
+      'desc' => __( '', 'UkuuPeople' ),
       'id'   => $prefix . 'ukuu-twitter-handle',
       'type' => 'text_medium',
+      'attributes'  => array(
+        'placeholder' => __( '@sampleteitterhandle', 'UkuuPeople' )
+      ),
     ) ,
     'ukuu-facebook-url' => array(
-      'name' => __( 'Facebook URL', 'cmb2' ),
-      'desc' => __( '', 'cmb2' ),
+      'name' => __( 'Facebook Username', 'UkuuPeople' ),
+      'desc' => __( '', 'UkuuPeople' ),
       'id'   => $prefix . 'ukuu-facebook-url',
-      'type' => 'text_url',
+      'type' => 'text_medium',
+      'attributes'  => array(
+        'placeholder' => __( 'samplefacebookusername', 'UkuuPeople' )
+      ),
     ),
     'ukuu-date-of-birth' => array(
-      'name' => __( 'Date Of Birth', 'cmb2' ),
-      'desc' => __( '', 'cmb2' ),
+      'name' => __( 'Date Of Birth', 'UkuuPeople' ),
+      'desc' => __( '', 'UkuuPeople' ),
       'id'   => $prefix . 'ukuu-date-of-birth',
       'type' => 'text_date',
     ),
     'streetaddress' => array(
-      'name' => __( 'Street Address', 'cmb2' ),
-      'desc' => __( '', 'cmb2' ),
+      'name' => __( 'Street Address', 'UkuuPeople' ),
+      'desc' => __( '', 'UkuuPeople' ),
       'id'   => $prefix . 'streetaddress',
       'type' => 'text_medium',
     ) ,
     'streetaddress2' => array(
-      'name' => __( 'Street Address Line 2', 'cmb2' ),
-      'desc' => __( '', 'cmb2' ),
+      'name' => __( 'Street Address Line 2', 'UkuuPeople' ),
+      'desc' => __( '', 'UkuuPeople' ),
       'id'   => $prefix . 'streetaddress2',
       'type' => 'text_medium',
     ),
     'city' => array(
-      'name' => __( 'City', 'cmb2' ),
-      'desc' => __( '', 'cmb2' ),
+      'name' => __( 'City', 'UkuuPeople' ),
+      'desc' => __( '', 'UkuuPeople' ),
       'id'   => $prefix . 'city',
       'type' => 'text_medium',
     ) ,
     'postalcode' => array(
-      'name' => __( 'Postal code', 'cmb2' ),
-      'desc' => __( '', 'cmb2' ),
+      'name' => __( 'Postal code', 'UkuuPeople' ),
+      'desc' => __( '', 'UkuuPeople' ),
       'id'   => $prefix . 'postalcode',
       'type' => 'text_medium',
     ) ,
     'country' => array(
-      'name' => __( 'Country', 'cmb2' ),
-      'desc' => __( '', 'cmb2' ),
+      'name' => __( 'Country', 'UkuuPeople' ),
+      'desc' => __( '',  'UkuuPeople' ),
       'id'   => $prefix . 'country',
       'type' => 'text_medium',
     ) ,
     'state' => array(
-      'name' => __( 'State', 'cmb2' ),
-      'desc' => __( '', 'cmb2' ),
+      'name' => __( 'State', 'UkuuPeople' ),
+      'desc' => __( '', 'UkuuPeople' ),
       'id'   => $prefix . 'state',
       'type' => 'text_medium',
     ) ,
     'privacy-settings' => array(
-      'name'    => __( 'Preferred Contact Method', 'cmb2' ),
-      'desc'    => __( '', 'cmb2' ),
+      'name'    => __( 'Preferred Contact Method', 'UkuuPeople' ),
+      'desc'    => __( '', 'UkuuPeople' ),
       'id'      => $prefix . 'privacy-settings',
       'type'    => 'multicheck',
       // 'multiple' => true, // Store values in individual rows
       'options' => array(
-        'do_not_phone' => __( 'Phone', 'cmb2' ),
-        'do_not_email' => __( 'Email', 'cmb2' ),
-        'do_not_sms' => __( 'SMS', 'cmb2' ),
+        'do_not_phone' => __( 'Phone', 'UkuuPeople' ),
+        'do_not_email' => __( 'Email', 'UkuuPeople' ),
+        'do_not_sms' => __( 'SMS', 'UkuuPeople' ),
       ),
       // 'inline'  => true, // Toggles display to inline
     ),
     'bulk-mailings' => array(
-      'name'    => __( 'Bulk Mailings', 'cmb2' ),
-      'desc'    => __( '', 'cmb2' ),
+      'name'    => __( 'Bulk Mailings', 'UkuuPeople' ),
+      'desc'    => __( '', 'UkuuPeople' ),
       'id'      => $prefix . 'bulk-mailings',
       'type'    => 'multicheck',
       // 'multiple' => true, // Store values in individual rows
       'options' => array(
-        'opt_out' => __( 'Opt Out', 'cmb2' ),
+        'opt_out' => __( 'Opt Out', 'UkuuPeople' ),
       ),
       // 'inline'  => true, // Toggles display to inline
     ) ,
     'startdate' => array(
-      'name' => __( 'Start Date*', 'cmb2' ),
-      'desc' => __( 'Enter the Start Date', 'cmb2' ),
+      'name' => __( 'Start Date*', 'UkuuPeople' ),
+      'desc' => __( 'Enter the Start Date', 'UkuuPeople' ),
       'id'   => $prefix . 'startdate',
       'type' => 'text_datetime_timestamp',
       'attributes'  => array(
@@ -153,39 +159,39 @@ $customterm = array(
       ),
     ) ,
     'enddate' => array(
-      'name' => __( 'End Date*', 'cmb2' ),
-      'desc' => __( 'Enter the End Date', 'cmb2' ),
+      'name' => __( 'End Date', 'UkuuPeople' ),
+      'desc' => __( 'Enter the End Date', 'UkuuPeople' ),
       'id'   => $prefix . 'enddate',
       'type' => 'text_datetime_timestamp',
       'attributes'  => array(
-        'required'    => 'required',
       ),
     ),
     'status' => array(
-      'name'             => __( 'Status*', 'cmb2' ),
-      'desc'             => __( 'Status of Touchpoint', 'cmb2' ),
+      'name'             => __( 'Status*', 'UkuuPeople' ),
+      'desc'             => __( 'Status of Touchpoint', 'UkuuPeople' ),
       'id'               => $prefix . 'status',
       'type'             => 'select',
       'attributes'  => array(
         'required'    => 'required',
       ),
       'options'          => array(
-        'scheduled' => __( 'Scheduled', 'cmb2' ),
-        'completed'   => __( 'Completed', 'cmb2' ),
-        'cancel'     => __( 'Cancel', 'cmb2' ),
+        'scheduled' => __( 'Scheduled', 'UkuuPeople' ),
+        'completed'   => __( 'Completed','UkuuPeople' ),
+        'cancel'     => __( 'Cancel', 'UkuuPeople' ),
       ),
     ) ,
     'details' => array(
-      'name' => __( 'Details', 'cmb2' ),
-      'desc' => __( '', 'cmb2' ),
+      'name' => __( 'Details', 'UkuuPeople' ),
+      'desc' => __( '', 'UkuuPeople' ),
       'id'   => $prefix . 'details',
       'type' => 'textarea_small',
     ) ,
     'attachments' => array(
-      'name' => __( 'Attachments', 'cmb2' ),
-      'desc' => __( 'Upload a file or enter a URL.', 'cmb2' ),
+      'name' => __( 'Attachments', 'UkuuPeople' ),
+      'desc' => __( 'Upload a file or enter a URL.', 'UkuuPeople' ),
       'id'   => $prefix . 'attachments',
-      'type' => 'file',
+      'type' => 'file_list',
+      'preview_size' => array( 100, 100 ),
     ),
   )
 );

@@ -1,10 +1,10 @@
 === Simple WordPress CRM - UkuuPeople ===
-Contributors: nathanporter, marisaporter, stephenlobo, tonymazz, nileemaJ, yogeshnipane
+Contributors: nathanporter, marisaporter, stephenlobo, tonymazz, nileemaJ, yogeshnipane, prashantgajare
 Donate Link: http://ukuupeople.com
 Tags: crm, contact, customer, client, relationship manager, wordpress crm, nonprofit, mailchimp, marketing, sales, email, list building, fundraising, donations
 Requires at least: 3.8
 Tested up to: 4.2
-Stable tag: 1.0.4
+Stable tag: 1.5
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 

@@ -81,6 +81,9 @@ jQuery(document).ready(function() {
 	});
     });
 
+    jQuery('.post-type-wp-type-contacts .edit_contact a').click( function() {
+	jQuery('.post-type-wp-type-contacts #wpcf-group-edit-contact-info').removeClass( 'closed' );
+    });
     jQuery('select#touchpoint-list').on('change', function() {
 	noteChanges(this);
     });
@@ -95,6 +98,166 @@ jQuery(document).ready(function() {
 	    jQuery('.post-type-wp-type-activity #wpcf-group-activity-information .cmb2-id-wpcf-status').show();
 	}
     }
+
+    //dialog box
+    jQuery( ".wrap h2 a" ).attr("href", "#");
+    jQuery( "#dialog" ).dialog({
+        modal : true,
+        autoOpen: false,
+        show: {
+            effect: "blind",
+            duration: 1000
+        },
+        hide: {
+            effect: "explode",
+            duration: 1000
+        },
+    });
+
+    jQuery( ".wrap h2 a" ).click(function() {
+        jQuery( "#dialog" ).dialog( "open" );
+    });
+    jQuery("input[name='wp-contact-type-select']").on('click',function( event ) {
+        window.location = jQuery(this).attr('redirect');
+    });
+    jQuery("input[name='wp-touchpoint-contact-select']").on('click',function( event ) {
+        var contactid = jQuery("#touchpoint_contact_id").val();
+        var url = jQuery(this).attr('redirect')+"&cid="+contactid;
+        window.location = url;
+    });
+    //dialog box
+
+    // autocomplete for contact list
+    var data = {
+            'action': 'contact_list',
+	};
+    var result = [];
+    jQuery.post( ajaxurl, data, function( response ) {
+	var availableTags = JSON.parse(response);
+	jQuery.each(availableTags, function( index, value ) {
+	    result.push({ 'value' : value.id , 'label' : value.name});
+	});
+    });
+
+    // autocomplete for assignee contact
+    var assign_data = {
+            'action': 'assign_contact_list',
+	};
+    var assing_result = [];
+    jQuery.post( ajaxurl, assign_data, function( response ) {
+	var availableTags = JSON.parse(response);
+	jQuery.each(availableTags, function( index, value ) {
+	    assing_result.push({ 'value' : value.id , 'label' : value.name});
+	});
+    });
+
+
+    // autocomplete for quick add touchpoint
+    jQuery( "#dashboard-widgets-wrap #ukuuCRM-dashboard-createactivity-widget .quickadd input[name='dname']" ).autocomplete({
+	//source: availableTags,
+	minLength: 0,
+	source: result,
+	focus: function( event, ui ) {
+	    jQuery( ".quickadd input[name='dname']" ).val( ui.item.label );
+	    return false;
+	},
+	select: function( event, ui ) {
+	    jQuery( ".quickadd input[name='dname']" ).val( ui.item.label );
+	    jQuery( "#dcontact_id" ).val( ui.item.value );
+	    
+	    return false;
+	}
+    }).autocomplete( "instance" )._renderItem = function( ul, item ) {
+	return jQuery( "<li>" )
+	    .append( "<a>" + item.label + "</a>" )
+	    .appendTo( ul );
+    };
+
+    // autocomplete for add new touchpoint
+    jQuery( ".post-type-wp-type-activity input[name='touchpoint_contact_name']" ).autocomplete({
+	//source: availableTags,
+	minLength: 0,
+	source: result,
+	focus: function( event, ui ) {
+	    jQuery( ".post-type-wp-type-activity input[name='touchpoint_contact_name']" ).val( ui.item.label );
+	    return false;
+	},
+	select: function( event, ui ) {
+	    jQuery( ".post-type-wp-type-activity input[name='touchpoint_contact_name']" ).val( ui.item.label );
+	    jQuery( "#touchpoint_contact_id" ).val( ui.item.value );
+	    
+	    return false;
+	}
+    }).autocomplete( "instance" )._renderItem = function( ul, item ) {
+	return jQuery( "<li>" )
+	    .append( "<a>" + item.label + "</a>" )
+	    .appendTo( ul );
+    };
+
+    jQuery('#quickAddform').on('submit', function (e) {
+	e.preventDefault();
+	var fd = new FormData(); 
+	fd.append('action', 'quick_add_touchpoint');
+
+	var dtype = jQuery(this).find('select[name="dtype"]').val();
+	var ddetails = jQuery(this).find('textarea[name="ddetails"]').val();
+	fd.append('dtype', dtype); 
+	fd.append('ddetails', ddetails); 
+	
+	var arr = ["contact_id","dsubject","dsdate","dedate","dstime","detime","filename","touchpoint_assign_id"];
+	jQuery.each(arr, function( index, value ) {
+	    var datavalue = jQuery(document).find('input[name="'+value+'"]').val();
+	    fd.append(value, datavalue); 
+	});
+
+	jQuery.ajax({
+            type: 'POST',
+	    url : ajaxurl,
+            data: fd,
+            contentType: false,
+            processData: false,
+            success: function(response){
+		location.reload(true);
+            }
+	});
+
+	jQuery('#quickAddform').trigger('reset');
+	jQuery(".quickadd #filename").hide();
+	jQuery(".quickadd #touchpoint_assign_name_display").hide();
+    });
+
+    jQuery("#dashboard-widgets-wrap #ukuuCRM-dashboard-createactivity-widget .quickadd input[name='dupload']").click( function() {
+	formfield = jQuery('.quickadd #filename').attr('name');
+	tb_show('', 'media-upload.php?type=image&amp;TB_iframe=true');
+	return false;
+    });
+
+    window.send_to_editor = function(html) {
+	imgurl = jQuery('img',html).attr('src');
+	jQuery('.quickadd #filename').val(imgurl);
+	jQuery(".quickadd #filename").show();
+	tb_remove();
+    }
+
+    jQuery('.post-type-wp-type-activity .over-image').hide();
+    jQuery('.post-type-wp-type-activity .inner-attachment-first').hide();
+    jQuery(".post-type-wp-type-activity .attachment-first").hover(function(){
+	var id = this.id;
+	jQuery( '.post-type-wp-type-activity #'+id+' .over-image' ).show();
+	jQuery( '.post-type-wp-type-activity #'+id+' .inner-attachment-first' ).show();
+    }, function(){
+	var id = this.id;
+	jQuery( '.post-type-wp-type-activity #'+id+' .over-image' ).hide();
+	jQuery( '.post-type-wp-type-activity #'+id+' .inner-attachment-first' ).hide();
+    });
+
+    jQuery('.post-type-wp-type-activity .edit-touchpoint a').click( function() {
+	jQuery('.post-type-wp-type-activity #wpcf-group-activity-information').removeClass( 'closed' );
+    });
+    
+    jQuery('#wpcf-startdate_time').removeAttr( "required" );
+
+    jQuery("#wpcf_touchpoint_assigned_metabox .cmb-add-row-button.button").text('Add another Assignee');
 });
 
 //graph on Contact and event list
@@ -142,7 +305,7 @@ jQuery( '#graph' ).ready(function() {
 
 	var margins = {
 	    top: 0,
-	    left: 10,
+	    left: 5,
 	    right: 5,
 	    bottom: 5
 	};
@@ -180,7 +343,7 @@ jQuery( '#graph' ).ready(function() {
 
 	var svg = d3.select('#graph')
 	    .append('svg')
-	    .attr('width', width + margins.left + margins.right)
+	    .attr('width', width + margins.left + margins.right + 20 )
 	    .attr('height', height + margins.top + margins.bottom)
 	    .attr('transform', 'translate(' + margins.left + ',' + margins.top + ')')
 	    .style('margin-left','10')
@@ -230,7 +393,7 @@ jQuery( '#graph' ).ready(function() {
 
 	        });
 	        var rangeBand = x/xMax*width;
-	        return rangeBand+10;
+	        return rangeBand+5;
 	    }
 
 	         )
@@ -249,7 +412,7 @@ jQuery( '#graph' ).ready(function() {
 	    .attr("font-size", "30px")
 	    .attr("font-weight", "bold")
 	    .attr("fill", "#FFFFFF")
-	    .style("margin-left", "10");
+	    .style("margin-left", "5");
 
 	var rects = groups.selectAll('rect')
 	    .data(function (d) {

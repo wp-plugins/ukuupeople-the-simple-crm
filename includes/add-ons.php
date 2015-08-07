@@ -33,11 +33,10 @@ add_action( 'admin_menu', 'ukuupeople_add_ons_init' );
 function ukuupeople_add_ons_page() {
 	ob_start(); ?>
 	<div class="wrap" id="ukuupeople-add-ons">
-		<h2><?php _e( 'UkuuPeople Add-ons' ); ?>
-			&nbsp;&mdash;&nbsp;<a href=" http://ukuupeople.com/add-ons/" class="button-primary ukuupeople-view-addons-all" title="<?php _e( 'Browse All Extensions' ); ?>" target="_blank"><?php _e( 'View All Add-ons' ); ?><span class="dashicons dashicons-external"></span></a>
+     <h2><?php _e( 'UkuuPeople Add-ons', 'UkuuPeople' ); ?>
+     &nbsp;&mdash;&nbsp;<a href=" http://ukuupeople.com/add-ons/" class="button-primary ukuupeople-view-addons-all" title="<?php _e( 'Browse All Extensions', 'UkuuPeople' ); ?>" target="_blank"><?php _e( 'View All Add-ons', 'UkuuPeople' ); ?><span class="dashicons dashicons-external"></span></a>
 		</h2>
-
-		<p><?php _e( 'Extend the awesomeness of Ukuu People.' ); ?></p>
+<p><?php _e( 'Extend the awesomeness of Ukuu People.' , 'UkuuPeople' ); ?></p>
 		<?php echo ukuupeople_add_ons(); ?>
 	</div>
 	<?php

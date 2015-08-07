@@ -149,4 +149,36 @@ class ukuupeople_update {
      return true;
    }
 
+   // ******** Updater functions ********
+   public function ukuu_update_1005() {
+     global $ukuupeople_db_version, $wpdb;
+     $table_name = $wpdb->prefix . 'postmeta';
+     $wpdb->flush();
+     $retrieve = $wpdb->get_results(
+       "
+               SELECT e.post_id, e.meta_value as meta_value, s.meta_value as attachment_id
+               FROM $table_name as e
+               LEFT JOIN ( SELECT post_id , meta_value FROM $table_name
+               WHERE meta_key = 'wpcf-attachments_id' ) as s
+               ON (e.post_id = s.post_id)
+               WHERE e.meta_key = 'wpcf-attachments'
+               "
+     );
+     if ( !empty( $retrieve ) ) {
+       foreach ($retrieve as $key => $value ) {
+         $image_url = maybe_serialize( array($value->attachment_id => $value->meta_value) );
+         $post_id = $value->post_id;
+         $wpdb->update(
+           $table_name,
+           array(
+             'meta_value' => $image_url,	// string
+           ),
+           array( 'post_id' => $value->post_id,'meta_key' => 'wpcf-attachments')
+         );
+       }
+     }
+     update_option( "ukuupeople_db_version", $ukuupeople_db_version );
+     return true;
+   }
+
 }

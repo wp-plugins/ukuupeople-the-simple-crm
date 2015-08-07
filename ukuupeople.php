@@ -11,11 +11,11 @@ define( 'UKUUPEOPLE_RELPATH', plugins_url() . '/' . basename( UKUUPEOPLE_ABSPATH
   Plugin URI: http://ukuupeople.com/
   Description: Ukuu People is the premium plugin that helps you elegantly manage all of your human relationships.
   Ukuu People effortlessly ties all of your contact interactions and contact data collection tools together to form one authoritative master list of all of your contacts and a record of your interactions with them.
-  Version: 1.0.4
+  Version: 1.5
   Author: UKUU Logic
   Author URI: http://ukuulogic.com/
   License: GPL 3
-  Text Domain:
+  Text Domain: UkuuPeople
 */
 /*
   This program is free software; you can redistribute it and/or
@@ -34,7 +34,7 @@ define( 'UKUUPEOPLE_RELPATH', plugins_url() . '/' . basename( UKUUPEOPLE_ABSPATH
 */
 
 global $ukuupeople_db_version;
-$ukuupeople_db_version = '1.0.4';
+$ukuupeople_db_version = '1.5';
 
 register_activation_hook( __FILE__, 'on_activation' );
 register_deactivation_hook( __FILE__, 'on_deactivation' );
@@ -67,7 +67,6 @@ function on_activation() {
 
   global $wpdb;
   global $ukuupeople_db_version;
-
   $table_name = $wpdb->prefix . 'ukuu_favorites';
   $post_table = $wpdb->prefix . 'posts';
   $author_table = $wpdb->prefix . 'users';
@@ -135,7 +134,8 @@ function ukuupeople_admin_notices() {
  */
 add_action( 'admin_enqueue_scripts', 'ukuupeople_style' );
 function ukuupeople_style() {
-  wp_enqueue_style( 'ukuupeople-style', UKUUPEOPLE_RELPATH.'/ukuupeople.css');
+  wp_enqueue_style( 'ukuupeople-style', UKUUPEOPLE_RELPATH.'/css/ukuupeople.css');
+  wp_enqueue_script( 'jquery-ui-autocomplete' );
 }
 
 function on_uninstall() {
