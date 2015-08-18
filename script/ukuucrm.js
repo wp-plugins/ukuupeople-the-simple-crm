@@ -87,6 +87,20 @@ jQuery(document).ready(function() {
     jQuery('select#touchpoint-list').on('change', function() {
 	noteChanges(this);
     });
+    jQuery("select[name='dtype']").on('change', function() {
+	DashboardNoteChanges(this);
+    });
+    function DashboardNoteChanges ($this) {
+	if (jQuery($this).val() == 'wp-type-activity-note') {
+	    jQuery('#quickAddform .quickadd input[name="dsdate"]').parent().parent().hide();
+	    jQuery('#quickAddform .quickadd input[name="dsdate"]').prop("disabled",true);
+	    jQuery('#quickAddform .quickadd input[name="dedate"]').parent().parent().hide();
+	} else {
+	    jQuery('#quickAddform .quickadd input[name="dsdate"]').parent().parent().show();
+	    jQuery('#quickAddform .quickadd input[name="dsdate"]').prop("disabled",false);
+	    jQuery('#quickAddform .quickadd input[name="dedate"]').parent().parent().show();
+	}
+    }
     function noteChanges ($this) {
 	if (jQuery($this).val() == 'wp-type-activity-note') {
 	    jQuery('.post-type-wp-type-activity #wpcf-group-activity-information .cmb2-id-wpcf-startdate').hide();
@@ -100,7 +114,6 @@ jQuery(document).ready(function() {
     }
 
     //dialog box
-    jQuery( ".wrap h2 a" ).attr("href", "#");
     jQuery( "#dialog" ).dialog({
         modal : true,
         autoOpen: false,
@@ -112,10 +125,6 @@ jQuery(document).ready(function() {
             effect: "explode",
             duration: 1000
         },
-    });
-
-    jQuery( ".wrap h2 a" ).click(function() {
-        jQuery( "#dialog" ).dialog( "open" );
     });
     jQuery("input[name='wp-contact-type-select']").on('click',function( event ) {
         window.location = jQuery(this).attr('redirect');

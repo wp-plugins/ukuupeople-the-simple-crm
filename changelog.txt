@@ -1,6 +1,14 @@
 == Changelog ==
 
 For more information, see [Releases](http://ukuupeople.com/).
+= 1.5.1 = 
+Fix bugs related to Wordpress 4.3 release
+
+= 1.5 =
+Major Release
+Improved Functionality of Touchpoint User Interface
+Added Language Support
+Moved License and Integration Management to settings panel 
 
 = 1.0.4 =
 Localization fixes related to date picker
@@ -20,6 +28,14 @@ Launch!
 
 
 == Upgrade Notice ==
+= 1.5.1 = 
+Fix bugs related to Wordpress 4.3 release
+
+= 1.5 =
+Major Release
+Improved Functionality of Touchpoint User Interface
+Added Language Support
+Moved License and Integration Management to settings panel 
 
 = 1.0.3 =
 We've removed the plugin dependencies on Types and Simple Fields. This should reduce plugin conflicts and make youre life easier!

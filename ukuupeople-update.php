@@ -181,4 +181,11 @@ class ukuupeople_update {
      return true;
    }
 
+   // ******** Updater functions ********
+   public function ukuu_update_1006() {
+     global $ukuupeople_db_version ;
+     update_option( "ukuupeople_db_version", $ukuupeople_db_version );
+     return true;
+   }
+
 }

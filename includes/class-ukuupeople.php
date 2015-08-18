@@ -452,6 +452,26 @@ class UkuuPeople{
       wp_enqueue_script('jquery-ui-dialog');
       // Common styles
       wp_enqueue_style("wp-jquery-ui-dialog");
+      global $wp_version;
+      if ( $wp_version <= '4.2.4' ) {?>
+      <script>
+          jQuery(document).ready(function() {
+              jQuery( ".wrap h2 a" ).attr("href", "#");
+              jQuery( ".wrap h2 a" ).click(function() {
+                  jQuery( "#dialog" ).dialog( "open" );
+                });
+            });
+      </script><?php
+        } else {?>
+      <script>
+          jQuery(document).ready(function() {
+              jQuery( ".wrap h1 a" ).attr("href", "#");
+              jQuery( ".wrap h1 a" ).click(function() {
+                  jQuery( "#dialog" ).dialog( "open" );
+                });
+            });
+      </script><?php
+        }
       wp_enqueue_script( 'ukuucrm', UKUUPEOPLE_RELPATH.'/script/ukuucrm.js' , array() );
     }
 
@@ -582,6 +602,12 @@ class UkuuPeople{
     if ( get_post_type() === 'wp-type-activity' ) {
       unset( $actions['view'] );
     }
+    if( get_post_type() === 'wp-type-contacts' ) {
+      unset( $actions['edit'] );
+      unset( $actions['view'] );
+      unset( $actions['trash'] );
+      unset( $actions['inline hide-if-no-js'] );
+    }
     return $actions;
   }
 
@@ -668,7 +694,7 @@ class UkuuPeople{
 	        $meta_value,
                $meta_value
         ) , OBJECT);
-
+        global $wp_version;
         if ( !empty( $terms ) ) {
           $postID = array_map ( function ( $v ){ return $v->ID; }, $terms );
           $qv['s']= '';
@@ -677,8 +703,13 @@ class UkuuPeople{
         <script src="<?php echo includes_url().'js/jquery/jquery.js'; ?>"></script>
         <script type="text/javascript">
            jQuery( function($){
+               version = '<?php echo $wp_version; ?>';
                var str = document.getElementsByName('s')[0].value;
-               $('.post-type-wp-type-contacts .wrap h2 .subtitle').html("<?php _e( 'Search results for','UkuuPeople'); ?> '"+str+"' ");
+               if ( version <= '4.2.4' ) {
+                 $('.post-type-wp-type-contacts .wrap h2 .subtitle').html("<?php _e( 'Search results for','UkuuPeople'); ?> '"+str+"' ");
+               } else {
+                 $('.post-type-wp-type-contacts .wrap h1 .subtitle').html("<?php _e( 'Search results for','UkuuPeople'); ?> '"+str+"' ");
+               }
              });
         </script><?php
             } else {
