@@ -119,3 +119,52 @@ Do you have questions or issues with UKUU PEOPLE? Use these support channels to 
 2. UkuuPeople contact listing.
 3. UkuuPeople contact dashboad (includes contribution display - add-on required).
 4. UkuuPeople TouchPoints listing.
+
+== Changelog ==
+
+For more information, see [Releases](http://ukuupeople.com/).
+= 1.5.1 = 
+Fix bugs related to Wordpress 4.3 release
+
+= 1.5 =
+Major Release
+Improved Functionality of Touchpoint User Interface
+Added Language Support
+Moved License and Integration Management to settings panel 
+
+= 1.0.4 =
+Localization fixes related to date picker
+
+= 1.0.3 =
+Remove plugin dependencies and streamline install process.
+
+= 1.0.2 =
+Bug fixes and improvements
+gravatar integration for contact images
+
+= 1.0.1 =
+Fix stability issues and backwards compatibility to PHP 5.3
+
+= 1.0.0 =
+Launch!
+
+
+== Upgrade Notice ==
+
+= 1.5.1 = 
+Fix bugs related to Wordpress 4.3 release
+
+= 1.5 =
+Major Release
+Improved Functionality of Touchpoint User Interface
+Added Language Support
+Moved License and Integration Management to settings panel 
+
+= 1.0.3 =
+We've removed the plugin dependencies on Types and Simple Fields. This should reduce plugin conflicts and make youre life easier!
+
+= 1.0.2 =
+We've made your contact record even easier to create and maintain by adding gravatar support and additional contact meta fields for "Job Title, Social Media, Date of Birth"
+
+= 1.0.0 =
+Launch - UkuuPeople is the simplest CRM tool for WordPress!
